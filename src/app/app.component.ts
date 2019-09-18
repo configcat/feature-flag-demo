@@ -263,7 +263,12 @@ export class AppComponent implements OnDestroy {
     }
 
     this.users.forEach(user => {
-      this.configCatClient.getValue(this.featureFlagKey, false, value => user.featureEnabled = value, user.userObject);
+      // Simulate multiple client SDKs with some delays
+      setTimeout(() => {
+        this.configCatClient.getValue(this.featureFlagKey, false, value => {
+          user.featureEnabled = value;
+        }, user.userObject);
+      }, Math.floor(Math.random() * 800));
     });
   }
 
