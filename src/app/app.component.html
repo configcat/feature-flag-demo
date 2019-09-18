@@ -66,6 +66,7 @@
       <div class='user' *ngIf="featureFlagKeyInitialized" [ngClass]="(user.featureEnabled)?'enabled':''">
         <div>{{user.userObject.email}}</div>
         <div>{{user.userObject.country}}</div>
+        <div>{{user.userObject.custom.subscriptionType}}</div>
       </div>
     </div>
   </div>

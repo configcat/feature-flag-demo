@@ -29,7 +29,7 @@ export class AppComponent implements OnDestroy {
   featureFlagKeyFormGroup: FormGroup;
 
   countries = ['US', 'UK', 'HU'];
-  subscriptionTypes = ['Free', 'Pro'];
+  subscriptionTypes = ['Free', 'Pro', 'Enterprise'];
 
   emails = [
     '0@dog.com',
