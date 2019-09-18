@@ -1,0 +1,73 @@
+<div *ngIf="!loading" class='container'>
+  <mat-vertical-stepper #stepper linear>
+    <mat-step [completed]="configCatClientInitialized">
+      <form [formGroup]="apiKeyFormGroup">
+        <ng-template matStepLabel>API Key</ng-template>
+        <mat-form-field class='apiKey'>
+          <mat-label>Api key</mat-label>
+          <input matInput placeholder="Api key" formControlName="apiKey" required>
+          <mat-error *ngIf="apiKeyFormGroup.hasError('apiKey')">
+            Invalid API key
+          </mat-error>
+        </mat-form-field>
+        <div>
+          <button mat-button (click)='initializeConfigCatClient(stepper)'>Next</button>
+        </div>
+      </form>
+    </mat-step>
+    <mat-step [editable]="configCatClientInitialized" [completed]="featureFlagKeyInitialized">
+      <form [formGroup]="featureFlagKeyFormGroup">
+        <ng-template matStepLabel>Feature flag key</ng-template>
+        <mat-form-field class='featureFlagKey'>
+          <mat-label>Feature flag key</mat-label>
+          <mat-select formControlName="featureFlagKey" required placeholder="Feature flag key">
+            <mat-option *ngFor="let key of allKeys" [value]="key">
+              {{key}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="apiKeyFormGroup.hasError('featureFlagKey')">
+            Invalid API key
+          </mat-error>
+        </mat-form-field>
+        <div>
+          <button mat-button (click)='initializeFeatureFlagKey(stepper)'>Next</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [editable]="featureFlagKeyInitialized">
+      <ng-template matStepLabel>Dogfooding</ng-template>
+      <button mat-button matStepperNext>Next</button>
+    </mat-step>
+    <mat-step [editable]="featureFlagKeyInitialized">
+      <ng-template matStepLabel>1% - Danger</ng-template>
+      <button mat-button matStepperNext>Next</button>
+    </mat-step>
+    <mat-step [editable]="featureFlagKeyInitialized">
+      <ng-template matStepLabel>10% - Danger</ng-template>
+      <button mat-button matStepperNext>Next</button>
+    </mat-step>
+    <mat-step [editable]="featureFlagKeyInitialized">
+      <ng-template matStepLabel>100% - Danger</ng-template>
+      <button mat-button matStepperNext>Next</button>
+    </mat-step>
+    <mat-step [editable]="featureFlagKeyInitialized">
+      <ng-template matStepLabel>100%</ng-template>
+      <button mat-button matStepperNext>Next</button>
+    </mat-step>
+    <mat-step [editable]="featureFlagKeyInitialized">
+      <ng-template matStepLabel>Clean up feature flags</ng-template>
+    </mat-step>
+  </mat-vertical-stepper>
+
+
+  <div class='users'>
+    <div *ngFor="let user of users" class="computer">
+      <div class='user' *ngIf="featureFlagKeyInitialized" [ngClass]="(user.featureEnabled)?'enabled':''">
+        <div>{{user.userObject.email}}</div>
+        <div>{{user.userObject.country}}</div>
+      </div>
+    </div>
+  </div>
+
+</div>

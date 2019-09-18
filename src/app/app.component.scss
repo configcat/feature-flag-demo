@@ -1,0 +1,33 @@
+.container {
+    display: flex;
+
+    .users {
+
+        flex-grow: 1;
+        display: flex;
+        flex-wrap: wrap;
+
+        .computer {
+            background-image: url('../assets/computer.svg');
+            background-size: 116px 100px;
+            width: 116px;
+            height: 100px;
+            background-repeat: no-repeat;
+            margin: 6px;
+ 
+            .user {
+                width: 104px;
+                height: 59px;
+                margin-left: 6px;
+                margin-right: 6px;
+                margin-top: 6px;
+                background-color: red;
+                color: white;
+            }
+
+            .enabled {
+                background-color: green !important;
+            }
+        }
+    }
+}
