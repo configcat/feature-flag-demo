@@ -25,6 +25,8 @@ export class AppComponent implements OnDestroy {
   featureFlagKey: string;
   featureFlagKeyInitialized = false;
 
+  baseUrl: string;
+
   apiKeyFormGroup: FormGroup;
   featureFlagKeyFormGroup: FormGroup;
 
@@ -177,10 +179,11 @@ export class AppComponent implements OnDestroy {
       };
     });
 
-    this.paramMapSubscription = route.paramMap.subscribe(paramMap => {
+    this.paramMapSubscription = route.queryParamMap.subscribe(params => {
 
-      this.apiKey = paramMap.get('apiKey');
-      this.featureFlagKey = paramMap.get('featureFlagKey');
+      this.apiKey = params.get('apiKey');
+      this.baseUrl = params.get('baseUrl');
+      this.featureFlagKey = params.get('featureFlagKey');
 
       if (!this.featureFlagKey) {
         this.featureFlagKey = 'isAwesomeFeatureEnabled';
@@ -195,6 +198,10 @@ export class AppComponent implements OnDestroy {
       });
 
       this.loading = false;
+
+      if (this.apiKey) {
+        this.initializeConfigCatClient(null);
+      }
     });
   }
 
@@ -211,7 +218,8 @@ export class AppComponent implements OnDestroy {
       configChanged: () => {
         this.refresh();
         this.handleFeatureFlags();
-      }
+      },
+      baseUrl: this.baseUrl
     });
 
     this.configCatClient.getAllKeys(keys => {
@@ -235,8 +243,14 @@ export class AppComponent implements OnDestroy {
 
       this.configCatClientInitialized = true;
       this.configCatClientInitializing = false;
-      stepper.selected.completed = true;
-      stepper.next();
+      if (stepper) {
+        stepper.selected.completed = true;
+        stepper.next();
+      }
+
+      if (this.featureFlagKey) {
+        this.initializeFeatureFlagKey(null);
+      }
     });
   }
 
@@ -249,8 +263,10 @@ export class AppComponent implements OnDestroy {
 
     this.featureFlagKeyInitialized = true;
     this.handleFeatureFlags();
-    stepper.selected.completed = true;
-    stepper.next();
+    if (stepper) {
+      stepper.selected.completed = true;
+      stepper.next();
+    }
   }
 
   initializeApplications() {
