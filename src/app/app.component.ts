@@ -57,7 +57,7 @@ export class AppComponent implements OnDestroy {
           length: 1
         });
         randomName.replace(/\s/g, "");
-        this.emails.push(`${randomName.toLowerCase()}\n${domain[0]}`);
+        this.emails.push(`${randomName.toLowerCase()}${domain[0]}`);
       }
 
     })
