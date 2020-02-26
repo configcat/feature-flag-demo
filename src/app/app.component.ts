@@ -31,11 +31,11 @@ export class AppComponent implements OnDestroy {
   apiKeyFormGroup: FormGroup;
   featureFlagKeyFormGroup: FormGroup;
 
-  countries = ['US', 'UK', 'HU'];
+  countries = ['US', 'UK', 'Canada'];
   subscriptionTypes = ['Free', 'Pro', 'Enterprise'];
   emailDomains = [
     ['@mycompany.com', 10,],
-    ['@example.com', 30],
+    ['@example.com', 20],
     ['@sensitive.com', 10]
   ]
   emails = [];
@@ -57,7 +57,7 @@ export class AppComponent implements OnDestroy {
           length: 1
         });
         randomName.replace(/\s/g, "");
-        this.emails.push(randomName.toLowerCase() + domain[0])
+        this.emails.push(`${randomName.toLowerCase()}\n${domain[0]}`);
       }
 
     })
