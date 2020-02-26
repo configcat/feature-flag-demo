@@ -1,42 +1,34 @@
 <div *ngIf="!loading" class='container'>
-  <mat-vertical-stepper #stepper linear>
-    <mat-step [completed]="configCatClientInitialized">
-      <form [formGroup]="apiKeyFormGroup">
-        <ng-template matStepLabel>API Key</ng-template>
-        <mat-form-field class='apiKey'>
-          <mat-label>Api key</mat-label>
-          <input matInput placeholder="Api key" formControlName="apiKey" required>
-          <mat-error *ngIf="apiKeyFormGroup.hasError('apiKey')">
-            Invalid API key
-          </mat-error>
-        </mat-form-field>
-        <div>
-          <button mat-button (click)='initializeConfigCatClient(stepper)'>Next</button>
-        </div>
-      </form>
-    </mat-step>
-    <mat-step [editable]="configCatClientInitialized" [completed]="featureFlagKeyInitialized">
-      <form [formGroup]="featureFlagKeyFormGroup">
-        <ng-template matStepLabel>Feature flag key</ng-template>
-        <mat-form-field class='featureFlagKey'>
-          <mat-label>Feature flag key</mat-label>
-          <mat-select formControlName="featureFlagKey" required placeholder="Feature flag key">
-            <mat-option *ngFor="let key of allKeys" [value]="key">
-              {{key}}
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="apiKeyFormGroup.hasError('featureFlagKey')">
-            Invalid API key
-          </mat-error>
-        </mat-form-field>
-        <div>
-          <button mat-button (click)='initializeFeatureFlagKey(stepper)'>Next</button>
-        </div>
-      </form>
-    </mat-step>
-  </mat-vertical-stepper>
-
-
+  <div class="header" *ngIf="showHeader">
+    <form [formGroup]="apiKeyFormGroup">
+      <ng-template matStepLabel>API Key</ng-template>
+      <mat-form-field class='apiKey' appearance="outline">
+        <mat-label>Api key</mat-label>
+        <input matInput placeholder="Api key" formControlName="apiKey" required>
+        <mat-error *ngIf="apiKeyFormGroup.hasError('apiKey')">
+          Invalid API key
+        </mat-error>
+      </mat-form-field>
+      <button class="go" mat-flat-button color="primary" (click)='initializeConfigCatClient()'>Go</button>
+    </form>
+    <form [formGroup]="featureFlagKeyFormGroup">
+      <ng-template matStepLabel>Feature flag key</ng-template>
+      <mat-form-field class='featureFlagKey' appearance="outline">
+        <mat-label>Feature flag key</mat-label>
+        <mat-select formControlName="featureFlagKey" required placeholder="Feature flag key">
+          <mat-option *ngFor="let key of allKeys" [value]="key">
+            {{key}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="apiKeyFormGroup.hasError('featureFlagKey')">
+          Invalid API key
+        </mat-error>
+      </mat-form-field>
+    </form>
+    <button mat-icon-button (click)="showHeader = false">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
   <div class='users'>
     <div *ngFor="let user of users" class="computer">
       <div class='user' *ngIf="featureFlagKeyInitialized" [ngClass]="(user.featureEnabled)?'enabled':''">
@@ -46,5 +38,4 @@
       </div>
     </div>
   </div>
-
 </div>
