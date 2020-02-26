@@ -34,7 +34,7 @@ export class AppComponent implements OnDestroy {
   countries = ['US', 'UK', 'Canada'];
   subscriptionTypes = ['Free', 'Pro', 'Enterprise'];
   emailDomains = [
-    ['@mycompany.com', 10,],
+    ['@sharktower.com', 10,],
     ['@example.com', 20],
     ['@sensitive.com', 10]
   ]
