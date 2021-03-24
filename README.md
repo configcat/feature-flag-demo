@@ -2,6 +2,8 @@
 
 The purpose of this app is to demonstrate ConfigCat feature management by simulating a number of clients or SDKs connected to the ConfigCat CDN.
 
+If you connect this app to one of your feature flags and play around with percentage and targeting rules.
+
 ## Usage
 1. Run locally or open https://feature-flag-demo.configcat.now.sh
 1. Enter your SDK Key (API Key), get it from https://app.configcat.com/sdkkey
