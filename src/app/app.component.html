@@ -15,7 +15,7 @@
       <ng-template matStepLabel>Feature flag key</ng-template>
       <mat-form-field class='featureFlagKey' appearance="outline">
         <mat-label>Feature flag key</mat-label>
-        <mat-select formControlName="featureFlagKey" required placeholder="Feature flag key">
+        <mat-select formControlName="featureFlagKey" required placeholder="Feature flag key" (change)="initializeFeatureFlagKey(null)">
           <mat-option *ngFor="let key of allKeys" [value]="key">
             {{key}}
           </mat-option>
