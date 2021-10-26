@@ -41,8 +41,8 @@ export class AppComponent implements OnInit, OnDestroy {
     subscriptionTypes: ['Free', 'Pro', 'Enterprise']
   };
 
-  emails: string[];
-  users: User[];
+  emails: string[] = [];
+  users: User[] = [];
 
   getRandom(array) {
     return array[Math.floor(Math.random() * array.length)];
