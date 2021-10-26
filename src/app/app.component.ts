@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import * as configcat from 'configcat-js';
@@ -12,7 +12,7 @@ import { uniqueNamesGenerator, names } from 'unique-names-generator';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit, OnDestroy {
   paramMapSubscription: Subscription;
   loading = true;
   showHeader = true;
@@ -31,71 +31,68 @@ export class AppComponent implements OnDestroy {
   apiKeyFormGroup: FormGroup;
   featureFlagKeyFormGroup: FormGroup;
 
-  countries = ['US', 'UK', 'Canada'];
-  subscriptionTypes = ['Free', 'Pro', 'Enterprise'];
-  emailDomains = [
-    ['@mycompany.com', 10,],
-    ['@example.com', 20],
-    ['@sensitive.com', 10]
-  ]
-  emails = [];
-  users = [];
+  startupData: StartupData = {
+    domains: [
+      { emailDomain: '@mycompany.com', userCount: 10 },
+      { emailDomain: '@example.com', userCount: 20 },
+      { emailDomain: '@sensitive.com', userCount: 10 },
+    ],
+    countries: ['US', 'UK', 'Canada'],
+    subscriptionTypes: ['Free', 'Pro', 'Enterprise']
+  };
+
+  emails: string[];
+  users: User[];
 
   getRandom(array) {
     return array[Math.floor(Math.random() * array.length)];
   }
 
   constructor(
-    route: ActivatedRoute,
+    private route: ActivatedRoute,
     private formBuilder: FormBuilder
   ) {
 
-    this.emailDomains.forEach(domain => {
-      for (let index = 0; index < domain[1]; index++) {
+  }
+  ngOnInit(): void {
+    this.generateUsers();
+    this.paramMapSubscription = this.route.queryParamMap.subscribe(params => {
+
+      this.apiKey = params.get('sdkKey');
+      this.baseUrl = params.get('baseUrl');
+      this.featureFlagKey = params.get('featureFlagKey');
+
+      if (!this.featureFlagKey) { this.featureFlagKey = 'isAwesomeFeatureEnabled'; }
+      this.apiKeyFormGroup = this.formBuilder.group({ apiKey: [this.apiKey, Validators.required] });
+      this.featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['', Validators.required] });
+
+      this.loading = false;
+
+      if (this.apiKey) { this.initializeConfigCatClient(); }
+    });
+  }
+
+  generateUsers() {
+    this.startupData.domains.forEach(domain => {
+      for (let index = 0; index < domain.userCount; index++) {
         const randomName: string = uniqueNamesGenerator({
           dictionaries: [names],
           length: 1
         });
         randomName.replace(/\s/g, "");
-        this.emails.push(`${randomName.toLowerCase()}\n${domain[0]}`);
+        this.emails.push(`${randomName.toLowerCase()}\n${domain.emailDomain}`);
       }
-
-    })
+    });
 
     this.users = this.emails.map(email => {
       return {
         userObject: {
           identifier: email,
           email,
-          country: this.getRandom(this.countries),
-          custom: { subscriptionType: this.getRandom(this.subscriptionTypes) }
+          country: this.getRandom(this.startupData.countries),
+          custom: { subscriptionType: this.getRandom(this.startupData.subscriptionTypes) }
         }, featureEnabled: false
       };
-    });
-
-    this.paramMapSubscription = route.queryParamMap.subscribe(params => {
-
-      this.apiKey = params.get('apiKey');
-      this.baseUrl = params.get('baseUrl');
-      this.featureFlagKey = params.get('featureFlagKey');
-
-      if (!this.featureFlagKey) {
-        this.featureFlagKey = 'isAwesomeFeatureEnabled';
-      }
-
-      this.apiKeyFormGroup = this.formBuilder.group({
-        apiKey: [this.apiKey, Validators.required]
-      });
-
-      this.featureFlagKeyFormGroup = this.formBuilder.group({
-        featureFlagKey: ['', Validators.required]
-      });
-
-      this.loading = false;
-
-      if (this.apiKey) {
-        this.initializeConfigCatClient();
-      }
     });
   }
 
@@ -189,4 +186,27 @@ export class AppComponent implements OnDestroy {
       this.paramMapSubscription = null;
     }
   }
+}
+
+export interface UserData {
+  emailDomain: string;
+  userCount: number;
+}
+
+export interface StartupData {
+  domains: UserData[];
+  countries: string[];
+  subscriptionTypes: string[];
+}
+
+export interface User {
+  userObject: UserObject;
+  featureEnabled: boolean;
+}
+
+export interface UserObject {
+  identifier: string;
+  email: string;
+  country: string;
+  custom: any;
 }
