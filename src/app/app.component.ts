@@ -4,7 +4,6 @@ import { Subscription } from 'rxjs';
 import * as configcat from 'configcat-js';
 import { IConfigCatClient } from 'configcat-common/lib/ConfigCatClient';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatStepper } from '@angular/material/stepper';
 import { uniqueNamesGenerator, names } from 'unique-names-generator';
 
 @Component({
@@ -135,12 +134,12 @@ export class AppComponent implements OnInit, OnDestroy {
       this.configCatClientInitializing = false;
 
       if (this.featureFlagKey) {
-        this.initializeFeatureFlagKey(null);
+        this.initializeFeatureFlagKey();
       }
     });
   }
 
-  initializeFeatureFlagKey(stepper: MatStepper) {
+  initializeFeatureFlagKey() {
     if (!this.featureFlagKeyFormGroup.valid) {
       return;
     }
@@ -149,10 +148,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.featureFlagKeyInitialized = true;
     this.handleFeatureFlags();
-    if (stepper) {
-      stepper.selected.completed = true;
-      stepper.next();
-    }
   }
 
   initializeApplications() {
