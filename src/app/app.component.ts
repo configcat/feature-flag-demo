@@ -19,17 +19,12 @@ export class AppComponent implements OnInit, OnDestroy {
   apiKey: string;
   configCatClient: IConfigCatClient;
   allKeys: string[] = [];
-
   configCatClientInitializing = false;
-
   featureFlagKey: string;
   featureFlagKeyInitialized = false;
-
   baseUrl: string;
-
   apiKeyFormGroup: FormGroup;
   featureFlagKeyFormGroup: FormGroup;
-
   startupData: StartupData = {
     domains: [
       { emailDomain: '@mycompany.com', userCount: 10 },
@@ -39,9 +34,10 @@ export class AppComponent implements OnInit, OnDestroy {
     countries: ['US', 'UK', 'Canada'],
     subscriptionTypes: ['Free', 'Pro', 'Enterprise']
   };
-
   emails: string[] = [];
   users: User[] = [];
+  greenCounter = 0;
+  redCounter = 0;
 
   getRandom(array) {
     return array[Math.floor(Math.random() * array.length)];
@@ -159,11 +155,15 @@ export class AppComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.greenCounter = 0;
+    this.redCounter = 0;
+
     this.users.forEach(user => {
       // Simulate multiple client SDKs with some delays
       setTimeout(() => {
         this.configCatClient.getValue(this.featureFlagKey, false, value => {
           user.featureEnabled = value;
+          if (value) { this.greenCounter++; } else { this.redCounter++; }
         }, user.userObject);
       }, Math.floor(Math.random() * 800));
     });

@@ -28,6 +28,10 @@
     <button mat-icon-button (click)="showHeader = false">
       <mat-icon>close</mat-icon>
     </button>
+    <div class="counter">
+      <div>Green: {{greenCounter}}</div>
+      <div>Red: {{redCounter}}</div>
+    </div>
   </div>
   <div class='users'>
     <div *ngFor="let user of users" class="computer">

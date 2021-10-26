@@ -22,6 +22,10 @@
         .featureFlagKey {
             width: 300px;
         }
+
+        .counter {
+            margin-left: auto;
+        }
     }
 
     .users {
@@ -29,6 +33,7 @@
         flex-grow: 1;
         display: flex;
         flex-wrap: wrap;
+        font-size: 14px;
 
         .computer {
             background-image: url('../assets/computer.svg');
