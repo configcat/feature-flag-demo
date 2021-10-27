@@ -25,6 +25,7 @@ export class AppComponent implements OnInit, OnDestroy {
   baseUrl: string;
   apiKeyFormGroup: FormGroup;
   featureFlagKeyFormGroup: FormGroup;
+  userCountFormGroup: FormGroup;
   startupData: StartupData = {
     domains: [
       { emailDomain: '@mycompany.com', userCount: 10 },
@@ -60,6 +61,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (!this.featureFlagKey) { this.featureFlagKey = 'isAwesomeFeatureEnabled'; }
       this.apiKeyFormGroup = this.formBuilder.group({ apiKey: [this.apiKey, Validators.required] });
       this.featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['', Validators.required] });
+      this.userCountFormGroup = this.formBuilder.group({ userCount: [40, Validators.required] });
 
       this.loading = false;
 
