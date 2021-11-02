@@ -50,7 +50,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   }
   ngOnInit(): void {
-    this.generateUsers();
     this.paramMapSubscription = this.route.queryParamMap.subscribe(params => {
 
       this.apiKey = params.get('sdkKey');
@@ -64,14 +63,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
       this.loading = false;
 
-      if (this.apiKey) { this.initializeConfigCatClient(); }
+      this.generateUsers();
     });
   }
 
   generateUsers() {
     this.users = [];
     this.emails = [];
-    const userCount = this.userCountFormGroup ? this.userCountFormGroup.controls.userCount.value : 20;
+    const userCount = this.userCountFormGroup.valid ? this.userCountFormGroup.controls.userCount.value : 20;
     this.startupData.domains.forEach(domain => {
       this.generateAndAddEmailAddresses(domain.emailDomain, domain.userCount);
     });
@@ -87,6 +86,7 @@ export class AppComponent implements OnInit, OnDestroy {
         }, featureEnabled: false
       };
     });
+    if (this.apiKey) { this.initializeConfigCatClient(); }
   }
 
   generateAndAddEmailAddresses(domain: string, count: number) {
