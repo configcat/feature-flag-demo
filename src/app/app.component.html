@@ -2,10 +2,10 @@
   <div class="header" *ngIf="showHeader">
     <form [formGroup]="apiKeyFormGroup">
       <mat-form-field class='textbox' appearance="outline">
-        <mat-label>Api key</mat-label>
-        <input matInput placeholder="Api key" formControlName="apiKey" required>
+        <mat-label>SDK key</mat-label>
+        <input matInput placeholder="SDK key" formControlName="apiKey" required>
         <mat-error *ngIf="apiKeyFormGroup.hasError('apiKey')">
-          Invalid API key
+          Invalid SDK key
         </mat-error>
       </mat-form-field>
       <button class="go" mat-flat-button color="primary" (click)='initializeConfigCatClient()'>Go</button>
@@ -29,13 +29,14 @@
     <div class="counter">
       <form [formGroup]="userCountFormGroup">
         <mat-form-field class='textbox' appearance="outline">
-          <mat-label># of example accounts</mat-label>
+          <mat-label># of @example accounts</mat-label>
           <input matInput placeholder="40" formControlName="userCount" type="number" required>
         </mat-form-field>
       <button class="go" mat-stroked-button (click)='generateUsers()'>Ok</button>
       </form>
     </div>
     <div class="counter">
+      <div>Total: {{users.length}}</div>
       <div>Green: {{greenCounter}}</div>
       <div>Red: {{redCounter}}</div>
     </div>

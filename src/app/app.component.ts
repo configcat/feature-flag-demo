@@ -29,7 +29,6 @@ export class AppComponent implements OnInit, OnDestroy {
   startupData: StartupData = {
     domains: [
       { emailDomain: '@mycompany.com', userCount: 10 },
-      { emailDomain: '@example.com', userCount: 20 },
       { emailDomain: '@sensitive.com', userCount: 10 },
     ],
     countries: ['US', 'UK', 'Canada'],
@@ -61,7 +60,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (!this.featureFlagKey) { this.featureFlagKey = 'isAwesomeFeatureEnabled'; }
       this.apiKeyFormGroup = this.formBuilder.group({ apiKey: [this.apiKey, Validators.required] });
       this.featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['', Validators.required] });
-      this.userCountFormGroup = this.formBuilder.group({ userCount: [40, Validators.required] });
+      this.userCountFormGroup = this.formBuilder.group({ userCount: [20, Validators.required] });
 
       this.loading = false;
 
@@ -70,16 +69,13 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   generateUsers() {
+    this.users = [];
+    this.emails = [];
+    const userCount = this.userCountFormGroup ? this.userCountFormGroup.controls.userCount.value : 20;
     this.startupData.domains.forEach(domain => {
-      for (let index = 0; index < domain.userCount; index++) {
-        const randomName: string = uniqueNamesGenerator({
-          dictionaries: [names],
-          length: 1
-        });
-        randomName.replace(/\s/g, "");
-        this.emails.push(`${randomName.toLowerCase()}\n${domain.emailDomain}`);
-      }
+      this.generateAndAddEmailAddresses(domain.emailDomain, domain.userCount);
     });
+    this.generateAndAddEmailAddresses('@example.com', userCount);
 
     this.users = this.emails.map(email => {
       return {
@@ -91,6 +87,17 @@ export class AppComponent implements OnInit, OnDestroy {
         }, featureEnabled: false
       };
     });
+  }
+
+  generateAndAddEmailAddresses(domain: string, count: number) {
+    for (let index = 0; index < count; index++) {
+      const randomName: string = uniqueNamesGenerator({
+        dictionaries: [names],
+        length: 1
+      });
+      randomName.replace(/\s/g, "");
+      this.emails.push(`${randomName.toLowerCase()}\n${domain}`);
+    }
   }
 
   initializeConfigCatClient() {
