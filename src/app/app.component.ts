@@ -5,6 +5,7 @@ import * as configcat from 'configcat-js';
 import { IConfigCatClient } from 'configcat-common/lib/ConfigCatClient';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { uniqueNamesGenerator, names } from 'unique-names-generator';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-root',
@@ -79,7 +80,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.users = this.emails.map(email => {
       return {
         userObject: {
-          identifier: email,
+          identifier: uuidv4(),
           email,
           country: this.getRandom(this.startupData.countries),
           custom: { subscriptionType: this.getRandom(this.startupData.subscriptionTypes) }
