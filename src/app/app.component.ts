@@ -96,7 +96,7 @@ export class AppComponent implements OnInit, OnDestroy {
         dictionaries: [names],
         length: 1
       });
-      randomName.replace(/\s/g, "");
+      randomName.replace(/\s/g, '');
       this.emails.push(`${randomName.toLowerCase()}\n${domain}`);
     }
   }
