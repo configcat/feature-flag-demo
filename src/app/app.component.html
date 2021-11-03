@@ -44,9 +44,9 @@
   <div class='users'>
     <div *ngFor="let user of users" class="computer">
       <div class='user' *ngIf="featureFlagKeyInitialized" [ngClass]="(user.featureEnabled)?'enabled':''">
-        <div>{{user.userObject.email}}</div>
-        <div>{{user.userObject.country}}</div>
-        <div>{{user.userObject.custom.subscriptionType}}</div>
+        <div>Email:<br>{{user.userObject.email}}</div>
+        <div>Country: {{user.userObject.country}}</div>
+        <div>subscriptionType: {{user.userObject.custom.subscriptionType}}</div>
       </div>
     </div>
   </div>

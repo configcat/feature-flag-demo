@@ -1,58 +1,62 @@
 .container {
+  display: flex;
+  flex-direction: column;
+
+  .header {
     display: flex;
-    flex-direction: column;
+    justify-content: start;
+    align-items: baseline;
 
-    .header {
-        display: flex;
-        justify-content: start;
-        align-items: baseline;
-
-        & > * {
-            margin-right: 2rem;
-        }
-
-        .go {
-            margin-left: 2rem;
-        }
-
-        .textbox {
-            width: 300px;
-        }
-
-        .counter {
-            margin-left: auto;
-        }
+    &>* {
+      margin-right: 2rem;
     }
 
-    .users {
-
-        flex-grow: 1;
-        display: flex;
-        flex-wrap: wrap;
-        font-size: 14px;
-
-        .computer {
-            background-image: url('../assets/computer.svg');
-            background-size: cover;
-            background-repeat: no-repeat;
-            width: 150px;
-            height: 120px;
-            margin: 6px;
- 
-            .user {
-                width: 136px;
-                height: 79px;
-                margin-left: 7px;
-                margin-right: 6px;
-                margin-top: 6px;
-                background-color: red;
-                color: white;
-                text-align: center;
-            }
-
-            .enabled {
-                background-color: green !important;
-            }
-        }
+    .go {
+      margin-left: 2rem;
     }
+
+    .textbox {
+      width: 300px;
+    }
+
+    .counter {
+      margin-left: auto;
+    }
+  }
+
+  .users {
+
+    flex-grow: 1;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 12px;
+
+    .computer {
+      background-image: url('../assets/computer.svg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      width: 180px;
+      height: 150px;
+      margin: 6px;
+
+      .user {
+        width: 164px;
+        height: 95px;
+        margin-left: 8px;
+        margin-right: 6px;
+        margin-top: 7px;
+        background-color: #c72424;
+        color: white;
+        text-align: center;
+
+        div {
+            margin-bottom: 5px;
+        }
+      }
+
+      .enabled {
+        background-color: green !important;
+      }
+    }
+  }
 }
