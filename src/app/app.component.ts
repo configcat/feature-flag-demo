@@ -109,6 +109,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.apiKey = this.apiKeyFormGroup.controls.apiKey.value;
 
     this.configCatClientInitializing = true;
+    if (this.configCatClient) {
+      this.configCatClient.dispose();
+    }
     this.configCatClient = configcat.createClientWithAutoPoll(this.apiKey, {
       pollIntervalSeconds: 1,
       configChanged: () => {
