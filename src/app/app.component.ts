@@ -87,7 +87,7 @@ export class AppComponent implements OnInit, OnDestroy {
         }, featureEnabled: false
       };
     });
-    if (this.apiKey) { this.initializeConfigCatClient(); }
+    if (this.apiKey) { this.handleFeatureFlags(); }
   }
 
   generateAndAddEmailAddresses(domain: string, count: number) {
