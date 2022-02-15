@@ -11,6 +11,8 @@ If you connect this app to one of your feature flags and play around with percen
 3. Flip the flag and see how the client change color.
 4. Add email or percentage based targeting rules and see what happens. 
 
+### Set a base URL
+Example: https://feature-flag-demo-configcat.vercel.app/?baseUrl=https:%2F%2Ftest-cdn-eu.configcat.com%2F
 
 ## To run locally
 Open terminal and run:
