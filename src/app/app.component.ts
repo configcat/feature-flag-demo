@@ -56,11 +56,21 @@ export class AppComponent implements OnInit, OnDestroy {
       this.apiKey = params.get('sdkKey');
       this.baseUrl = params.get('baseUrl');
       this.featureFlagKey = params.get('featureFlagKey');
+      let hideControls = params.get('hideControls');
 
-      if (!this.featureFlagKey) { this.featureFlagKey = 'isAwesomeFeatureEnabled'; }
+      if (!this.featureFlagKey) { this.featureFlagKey = ''; }
       this.apiKeyFormGroup = this.formBuilder.group({ apiKey: [this.apiKey, Validators.required] });
       this.featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['', Validators.required] });
       this.userCountFormGroup = this.formBuilder.group({ userCount: [20, Validators.required] });
+
+      if(this.apiKey && this.apiKey.length > 0) {
+        // at this point, we have everything to try to init the client
+        this.initializeConfigCatClient();
+        if(this.featureFlagKey && this.featureFlagKey.length > 0 && hideControls === "true") {
+          // it's very likely the app is configured through the url, and the user wants to use it that way
+          this.showHeader = false;
+        }
+      }
 
       this.loading = false;
 
@@ -150,6 +160,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   initializeFeatureFlagKey() {
     if (!this.featureFlagKeyFormGroup.valid) {
+      this.featureFlagKeyInitialized = false;
       return;
     }
 
