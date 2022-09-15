@@ -60,13 +60,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
       if (!this.featureFlagKey) { this.featureFlagKey = ''; }
       this.apiKeyFormGroup = this.formBuilder.group({ apiKey: [this.apiKey, Validators.required] });
-      this.featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['', Validators.required] });
+      this.featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: [this.featureFlagKey, Validators.required] });
       this.userCountFormGroup = this.formBuilder.group({ userCount: [20, Validators.required] });
 
-      if(this.apiKey && this.apiKey.length > 0) {
+      if(this.apiKey) {
         // at this point, we have everything to try to init the client
         this.initializeConfigCatClient();
-        if(this.featureFlagKey && this.featureFlagKey.length > 0 && hideControls === "true") {
+        let x = this.featureFlagKeyInitialized;
+        if(this.featureFlagKey && hideControls === "true") {
           // it's very likely the app is configured through the url, and the user wants to use it that way
           this.showHeader = false;
         }
