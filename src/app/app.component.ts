@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import * as configcat from 'configcat-js';
 import { IConfigCatClient } from 'configcat-common/lib/ConfigCatClient';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { uniqueNamesGenerator, names } from 'unique-names-generator';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -24,9 +24,9 @@ export class AppComponent implements OnInit, OnDestroy {
   featureFlagKey: string;
   featureFlagKeyInitialized = false;
   baseUrl: string;
-  apiKeyFormGroup: FormGroup;
-  featureFlagKeyFormGroup: FormGroup;
-  userCountFormGroup: FormGroup;
+  apiKeyFormGroup: UntypedFormGroup;
+  featureFlagKeyFormGroup: UntypedFormGroup;
+  userCountFormGroup: UntypedFormGroup;
   startupData: StartupData = {
     domains: [
       { emailDomain: '@mycompany.com', userCount: 10 },
@@ -46,7 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private formBuilder: FormBuilder
+    private formBuilder: UntypedFormBuilder
   ) {
 
   }

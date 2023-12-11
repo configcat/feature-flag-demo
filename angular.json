@@ -80,6 +80,6 @@
           }
         }
       }
-    }},
-  "defaultProject": "feature-flag-demo"
+    }
+  }
 }
