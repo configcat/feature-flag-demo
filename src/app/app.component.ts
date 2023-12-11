@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import * as configcat from 'configcat-js';
 import { IConfigCatClient } from 'configcat-common/lib/ConfigCatClient';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NonNullableFormBuilder, Validators } from '@angular/forms';
 import { uniqueNamesGenerator, names } from 'unique-names-generator';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -24,9 +24,9 @@ export class AppComponent implements OnInit, OnDestroy {
   featureFlagKey: string;
   featureFlagKeyInitialized = false;
   baseUrl: string;
-  apiKeyFormGroup: FormGroup;
-  featureFlagKeyFormGroup: FormGroup;
-  userCountFormGroup: FormGroup;
+  apiKeyFormGroup = this.formBuilder.group({ apiKey: ['', Validators.required] });
+  featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['', Validators.required] });
+  userCountFormGroup = this.formBuilder.group({ userCount: [20, Validators.required] });
   startupData: StartupData = {
     domains: [
       { emailDomain: '@mycompany.com', userCount: 10 },
@@ -46,7 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private formBuilder: FormBuilder
+    private formBuilder: NonNullableFormBuilder
   ) {
 
   }
@@ -56,18 +56,17 @@ export class AppComponent implements OnInit, OnDestroy {
       this.apiKey = params.get('sdkKey');
       this.baseUrl = params.get('baseUrl');
       this.featureFlagKey = params.get('featureFlagKey');
-      let hideControls = params.get('hideControls');
+      const hideControls = params.get('hideControls');
 
       if (!this.featureFlagKey) { this.featureFlagKey = ''; }
-      this.apiKeyFormGroup = this.formBuilder.group({ apiKey: [this.apiKey, Validators.required] });
-      this.featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: [this.featureFlagKey, Validators.required] });
-      this.userCountFormGroup = this.formBuilder.group({ userCount: [20, Validators.required] });
+      this.apiKeyFormGroup.patchValue({ apiKey: this.apiKey });
+      this.featureFlagKeyFormGroup.patchValue({ featureFlagKey: this.featureFlagKey });
+      this.userCountFormGroup.reset();
 
-      if(this.apiKey) {
+      if (this.apiKey) {
         // at this point, we have everything to try to init the client
         this.initializeConfigCatClient();
-        let x = this.featureFlagKeyInitialized;
-        if(this.featureFlagKey && hideControls === "true") {
+        if (this.featureFlagKey && hideControls === "true") {
           // it's very likely the app is configured through the url, and the user wants to use it that way
           this.showHeader = false;
         }
@@ -108,7 +107,7 @@ export class AppComponent implements OnInit, OnDestroy {
         length: 1
       });
       randomName.replace(/\s/g, '');
-      this.emails.push(`${randomName.toLowerCase()}\n${domain}`);
+      this.emails.push(`${randomName.toLowerCase()}${domain}`);
     }
   }
 
@@ -123,16 +122,17 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.configCatClient) {
       this.configCatClient.dispose();
     }
-    this.configCatClient = configcat.createClientWithAutoPoll(this.apiKey, {
+    this.configCatClient = configcat.getClient(this.apiKey, configcat.PollingMode.AutoPoll, {
       pollIntervalSeconds: 1,
-      configChanged: () => {
-        this.refresh();
-        this.handleFeatureFlags();
-      },
+      setupHooks: (hooks) =>
+        hooks.on('configChanged', () => {
+          this.refresh();
+          this.handleFeatureFlags();
+        }),
       baseUrl: this.baseUrl
     });
 
-    this.configCatClient.getAllKeys(keys => {
+    this.configCatClient.getAllKeysAsync().then(keys => {
       this.allKeys = keys;
 
       if (this.allKeys.length === 0) {
@@ -186,16 +186,16 @@ export class AppComponent implements OnInit, OnDestroy {
     this.users.forEach(user => {
       // Simulate multiple client SDKs with some delays
       setTimeout(() => {
-        this.configCatClient.getValue(this.featureFlagKey, false, value => {
+        this.configCatClient.getValueAsync(this.featureFlagKey, false, user.userObject).then(value => {
           user.featureEnabled = value;
           if (value) { this.greenCounter++; } else { this.redCounter++; }
-        }, user.userObject);
+        });
       }, Math.floor(Math.random() * 800));
     });
   }
 
   refresh() {
-    this.configCatClient.getAllKeys(keys => {
+    this.configCatClient.getAllKeysAsync().then(keys => {
       this.allKeys = keys;
     });
   }
