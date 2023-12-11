@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import * as configcat from 'configcat-js';
 import { IConfigCatClient } from 'configcat-common/lib/ConfigCatClient';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { NonNullableFormBuilder, Validators } from '@angular/forms';
 import { uniqueNamesGenerator, names } from 'unique-names-generator';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -24,9 +24,9 @@ export class AppComponent implements OnInit, OnDestroy {
   featureFlagKey: string;
   featureFlagKeyInitialized = false;
   baseUrl: string;
-  apiKeyFormGroup: UntypedFormGroup;
-  featureFlagKeyFormGroup: UntypedFormGroup;
-  userCountFormGroup: UntypedFormGroup;
+  apiKeyFormGroup = this.formBuilder.group({ apiKey: ['', Validators.required] });
+  featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['', Validators.required] });;
+  userCountFormGroup = this.formBuilder.group({ userCount: [20, Validators.required] });
   startupData: StartupData = {
     domains: [
       { emailDomain: '@mycompany.com', userCount: 10 },
@@ -46,7 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private formBuilder: UntypedFormBuilder
+    private formBuilder: NonNullableFormBuilder
   ) {
 
   }
@@ -59,15 +59,15 @@ export class AppComponent implements OnInit, OnDestroy {
       let hideControls = params.get('hideControls');
 
       if (!this.featureFlagKey) { this.featureFlagKey = ''; }
-      this.apiKeyFormGroup = this.formBuilder.group({ apiKey: [this.apiKey, Validators.required] });
-      this.featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: [this.featureFlagKey, Validators.required] });
-      this.userCountFormGroup = this.formBuilder.group({ userCount: [20, Validators.required] });
+      this.apiKeyFormGroup.patchValue({ apiKey: this.apiKey });
+      this.featureFlagKeyFormGroup.patchValue({ featureFlagKey: this.featureFlagKey });
+      this.userCountFormGroup.reset();
 
-      if(this.apiKey) {
+      if (this.apiKey) {
         // at this point, we have everything to try to init the client
         this.initializeConfigCatClient();
         let x = this.featureFlagKeyInitialized;
-        if(this.featureFlagKey && hideControls === "true") {
+        if (this.featureFlagKey && hideControls === "true") {
           // it's very likely the app is configured through the url, and the user wants to use it that way
           this.showHeader = false;
         }
