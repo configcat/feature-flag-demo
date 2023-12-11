@@ -108,7 +108,7 @@ export class AppComponent implements OnInit, OnDestroy {
         length: 1
       });
       randomName.replace(/\s/g, '');
-      this.emails.push(`${randomName.toLowerCase()}\n${domain}`);
+      this.emails.push(`${randomName.toLowerCase()}${domain}`);
     }
   }
 
@@ -123,16 +123,17 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.configCatClient) {
       this.configCatClient.dispose();
     }
-    this.configCatClient = configcat.createClientWithAutoPoll(this.apiKey, {
+    this.configCatClient = configcat.getClient(this.apiKey, configcat.PollingMode.AutoPoll, {
       pollIntervalSeconds: 1,
-      configChanged: () => {
-        this.refresh();
-        this.handleFeatureFlags();
-      },
+      setupHooks: (hooks) =>
+        hooks.on('configChanged', () => {
+          this.refresh();
+          this.handleFeatureFlags();
+        }),
       baseUrl: this.baseUrl
     });
 
-    this.configCatClient.getAllKeys(keys => {
+    this.configCatClient.getAllKeysAsync().then(keys => {
       this.allKeys = keys;
 
       if (this.allKeys.length === 0) {
@@ -186,16 +187,16 @@ export class AppComponent implements OnInit, OnDestroy {
     this.users.forEach(user => {
       // Simulate multiple client SDKs with some delays
       setTimeout(() => {
-        this.configCatClient.getValue(this.featureFlagKey, false, value => {
+        this.configCatClient.getValueAsync(this.featureFlagKey, false, user.userObject).then(value => {
           user.featureEnabled = value;
           if (value) { this.greenCounter++; } else { this.redCounter++; }
-        }, user.userObject);
+        });
       }, Math.floor(Math.random() * 800));
     });
   }
 
   refresh() {
-    this.configCatClient.getAllKeys(keys => {
+    this.configCatClient.getAllKeysAsync().then(keys => {
       this.allKeys = keys;
     });
   }
