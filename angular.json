@@ -71,11 +71,11 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "feature-flag-demo:build"
+            "buildTarget": "feature-flag-demo:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "feature-flag-demo:build:production"
+              "buildTarget": "feature-flag-demo:build:production"
             }
           }
         }
