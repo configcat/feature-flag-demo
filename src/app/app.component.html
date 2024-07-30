@@ -23,30 +23,14 @@
         </mat-error>
       </mat-form-field>
     </form>
-    <button mat-icon-button (click)="showHeader = false">
-      <mat-icon>close</mat-icon>
-    </button>
-    <div class="counter">
-      <form [formGroup]="userCountFormGroup">
-        <mat-form-field class='textbox' appearance="outline">
-          <mat-label># of &#64;example accounts</mat-label>
-          <input matInput placeholder="40" formControlName="userCount" type="number" required>
-        </mat-form-field>
-      <button class="go" mat-stroked-button (click)='generateUsers()'>Ok</button>
-      </form>
-    </div>
-    <div class="counter">
-      <div>Total: {{users.length}}</div>
-      <div>Green: {{greenCounter}}</div>
-      <div>Red: {{redCounter}}</div>
-    </div>
   </div>
   <div class='users'>
     <div *ngFor="let user of users" class="computer">
       <div class='user' *ngIf="featureFlagKeyInitialized" [ngClass]="(user.featureEnabled)?'enabled':''">
         <div>Email:<br>{{user.userObject.email}}</div>
         <div>Country: {{user.userObject.country}}</div>
-        <div>subscriptionType: {{user.userObject.custom.subscriptionType}}</div>
+        <div>SubscriptionType: {{user.userObject.custom.SubscriptionType}}</div>
+        <div>Tenant: {{user.userObject.custom.Tenant}}</div>
       </div>
     </div>
   </div>

@@ -26,14 +26,16 @@ export class AppComponent implements OnInit, OnDestroy {
   baseUrl: string;
   apiKeyFormGroup = this.formBuilder.group({ apiKey: ['', Validators.required] });
   featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['', Validators.required] });
-  userCountFormGroup = this.formBuilder.group({ userCount: [20, Validators.required] });
   startupData: StartupData = {
     domains: [
-      { emailDomain: '@mycompany.com', userCount: 10 },
-      { emailDomain: '@sensitive.com', userCount: 10 },
+      { emailDomain: '@example.com', userCount: 12 },
+      { emailDomain: '@friends.com', userCount: 12 },
+      { emailDomain: '@mycompany.com', userCount: 12 },
+      { emailDomain: '@sensitive.com', userCount: 12 },
     ],
-    countries: ['US', 'UK', 'Canada'],
-    subscriptionTypes: ['Free', 'Pro', 'Enterprise']
+    countries: ['Australia', 'Brazil', 'EU', 'USA'],
+    subscriptionTypes: ['Free', 'Pro', 'Enterprise'],
+    tenants: ['A', 'B', 'C']
   };
   emails: string[] = [];
   users: User[] = [];
@@ -61,7 +63,6 @@ export class AppComponent implements OnInit, OnDestroy {
       if (!this.featureFlagKey) { this.featureFlagKey = ''; }
       this.apiKeyFormGroup.patchValue({ apiKey: this.apiKey });
       this.featureFlagKeyFormGroup.patchValue({ featureFlagKey: this.featureFlagKey });
-      this.userCountFormGroup.reset();
 
       if (this.apiKey) {
         // at this point, we have everything to try to init the client
@@ -81,11 +82,9 @@ export class AppComponent implements OnInit, OnDestroy {
   generateUsers() {
     this.users = [];
     this.emails = [];
-    const userCount = this.userCountFormGroup.valid ? this.userCountFormGroup.controls.userCount.value : 20;
     this.startupData.domains.forEach(domain => {
       this.generateAndAddEmailAddresses(domain.emailDomain, domain.userCount);
     });
-    this.generateAndAddEmailAddresses('@example.com', userCount);
 
     this.users = this.emails.map(email => {
       return {
@@ -93,7 +92,10 @@ export class AppComponent implements OnInit, OnDestroy {
           identifier: uuidv4(),
           email,
           country: this.getRandom(this.startupData.countries),
-          custom: { subscriptionType: this.getRandom(this.startupData.subscriptionTypes) }
+          custom: {
+            SubscriptionType: this.getRandom(this.startupData.subscriptionTypes),
+            Tenant: this.getRandom(this.startupData.tenants)
+          }
         }, featureEnabled: false
       };
     });
@@ -217,6 +219,7 @@ export interface StartupData {
   domains: UserData[];
   countries: string[];
   subscriptionTypes: string[];
+  tenants: string[];
 }
 
 export interface User {
