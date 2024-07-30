@@ -1,28 +1,42 @@
 <div *ngIf="!loading" class='container'>
-  <div class="header" *ngIf="showHeader">
-    <form [formGroup]="apiKeyFormGroup">
-      <mat-form-field class='textbox' appearance="outline">
-        <mat-label>SDK key</mat-label>
-        <input matInput placeholder="SDK key" formControlName="apiKey" required>
-        <mat-error *ngIf="apiKeyFormGroup.hasError('apiKey')">
-          Invalid SDK key
-        </mat-error>
-      </mat-form-field>
-      <button class="go" mat-flat-button color="primary" (click)='initializeConfigCatClient()'>Go</button>
-    </form>
-    <form [formGroup]="featureFlagKeyFormGroup">
-      <mat-form-field class='textbox' appearance="outline">
-        <mat-label>Feature flag key</mat-label>
-        <mat-select formControlName="featureFlagKey" required placeholder="Feature flag key" (selectionChange)="initializeFeatureFlagKey()">
-          <mat-option *ngFor="let key of allKeys" [value]="key">
-            {{key}}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="apiKeyFormGroup.hasError('featureFlagKey')">
-          Invalid API key
-        </mat-error>
-      </mat-form-field>
-    </form>
+  <div>
+    <div class="header">
+      <div class="title-container">
+        <img class="cat" src="assets/cat-white.svg" alt="Home" />
+        <div class="title">ConfigCat Playground</div>
+      </div>
+      <div>Devices in this simulator will switch between GREEN and RED according to the
+        <strong>{{featureFlagKey}}</strong> feature flag
+        <span *ngIf="configName && environmentName">({{configName}} / {{environmentName}})</span> being ON and OFF
+        respectively.
+      </div>
+    </div>
+    <div *ngIf="showControls" class="controls">
+      <form [formGroup]="apiKeyFormGroup">
+        <mat-form-field class='textbox' appearance="outline">
+          <mat-label>SDK key</mat-label>
+          <input matInput placeholder="SDK key" formControlName="apiKey" required>
+          <mat-error *ngIf="apiKeyFormGroup.hasError('apiKey')">
+            Invalid SDK key
+          </mat-error>
+        </mat-form-field>
+        <button class="go" mat-flat-button color="primary" (click)='initializeConfigCatClient()'>Go</button>
+      </form>
+      <form [formGroup]="featureFlagKeyFormGroup" *ngIf="showControls">
+        <mat-form-field class='textbox' appearance="outline">
+          <mat-label>Feature flag key</mat-label>
+          <mat-select formControlName="featureFlagKey" required placeholder="Feature flag key"
+            (selectionChange)="initializeFeatureFlagKey()">
+            <mat-option *ngFor="let key of allKeys" [value]="key">
+              {{key}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="apiKeyFormGroup.hasError('featureFlagKey')">
+            Invalid API key
+          </mat-error>
+        </mat-form-field>
+      </form>
+    </div>
   </div>
   <div class='users'>
     <div *ngFor="let user of users" class="computer">
