@@ -19,11 +19,11 @@
     "@angular/platform-browser": "^18.1.2",
     "@angular/platform-browser-dynamic": "^18.1.2",
     "@angular/router": "^18.1.2",
-    "configcat-js": "^9.0.0",
+    "configcat-js": "^9.5.0",
     "rxjs": "~7.8.1",
     "tslib": "^2.4.0",
     "unique-names-generator": "^4.7.1",
-    "uuid": "^9.0.1",
+    "uuid": "^10.0.0",
     "zone.js": "~0.14.2"
   },
   "devDependencies": {
