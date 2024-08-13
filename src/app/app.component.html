@@ -42,10 +42,10 @@
   <div class='users'>
     <div *ngFor="let user of users" class="computer">
       <div class='user' *ngIf="featureFlagKeyInitialized" [ngClass]="(user.featureEnabled)?'enabled':''">
-        <div>Email:<br><strong>{{user.userObject.email}}</strong></div>
-        <div>Country: <strong>{{user.userObject.country}}</strong></div>
-        <div>SubscriptionType: <strong>{{user.userObject.custom.SubscriptionType}}</strong></div>
-        <div>Tenant: <strong>{{user.userObject.custom.Tenant}}</strong></div>
+        <div>Email:<br><span class="font-semibold">{{user.userObject.email}}</span></div>
+        <div>Country: <span class="font-semibold">{{user.userObject.country}}</span></div>
+        <div>SubscriptionType: <span class="font-semibold">{{user.userObject.custom.SubscriptionType}}</span></div>
+        <div>Tenant: <span class="font-semibold">{{user.userObject.custom.Tenant}}</span></div>
       </div>
     </div>
   </div>
