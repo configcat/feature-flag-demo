@@ -31,7 +31,6 @@ export class AppComponent implements OnInit, OnDestroy {
       { emailDomain: '@example.com', userCount: 12 },
       { emailDomain: '@friends.com', userCount: 12 },
       { emailDomain: '@mycompany.com', userCount: 12 },
-      { emailDomain: '@sensitive.com', userCount: 12 },
     ],
     countries: ['Australia', 'Brazil', 'EU', 'USA'],
     subscriptionTypes: ['Free', 'Pro', 'Enterprise'],
@@ -41,6 +40,7 @@ export class AppComponent implements OnInit, OnDestroy {
   users: User[] = [];
   configName = '';
   environmentName = '';
+  featureFlagUrl = '';
 
   getRandom(array) {
     return array[Math.floor(Math.random() * array.length)];
@@ -58,6 +58,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.apiKey = params.get('sdkKey');
       this.baseUrl = params.get('baseUrl');
       this.featureFlagKey = params.get('featureFlagKey');
+      this.featureFlagUrl = params.get('featureFlagUrl');
       this.environmentName = params.get('environmentName');
       this.configName = params.get('configName');
 

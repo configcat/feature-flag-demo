@@ -3,7 +3,6 @@
   flex-direction: column;
 
   .header {
-    min-height: 55px;
     border-bottom: 1px solid #aaa;
     background: #f8912c;
     background: -webkit-linear-gradient(right, #f8912c, #f14321);
@@ -19,6 +18,7 @@
     .title-container {
       display: flex;
       align-items: center;
+      margin: 6px 0;
 
       .cat {
         height: 64px;
@@ -57,9 +57,17 @@
 
   }
 
-  .users {
-    margin: 8px;
+  .info-banner {
+    border: 1px solid #8f99c94d;
+    background-color: #e2eefc;
+    border-radius: 5px;
+    padding: 24px 16px;
+    margin: 16px 16px 8px 16px;
+  }
 
+
+  .users {
+    margin: 0 8px;
     flex-grow: 1;
     display: flex;
     flex-wrap: wrap;
@@ -71,7 +79,7 @@
       background-repeat: no-repeat;
       width: 180px;
       height: 150px;
-      margin: 6px;
+      margin: 18px 6px;
 
       .user {
         width: 164px;
@@ -85,6 +93,10 @@
 
         div {
           margin-bottom: 5px;
+        }
+
+        strong {
+          letter-spacing: .5px;
         }
       }
 
