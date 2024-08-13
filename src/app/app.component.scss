@@ -61,19 +61,19 @@
     border: 1px solid #8f99c94d;
     background-color: #e2eefc;
     border-radius: 5px;
-    padding: 1rem;
-    
-    margin: 1rem;
+    padding: 24px 16px;
+    margin: 16px 16px 8px 16px;
   }
 
 
   .users {
-    margin: 8px;
+    margin: 0 8px;
 
     flex-grow: 1;
     display: flex;
     flex-wrap: wrap;
     font-size: 12px;
+    justify-content: space-between;
 
     .computer {
       background-image: url('../assets/computer.svg');
@@ -81,7 +81,7 @@
       background-repeat: no-repeat;
       width: 180px;
       height: 150px;
-      margin: 6px;
+      margin: 18px 6px;
 
       .user {
         width: 164px;
