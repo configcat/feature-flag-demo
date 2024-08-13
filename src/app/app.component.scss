@@ -3,7 +3,6 @@
   flex-direction: column;
 
   .header {
-    min-height: 55px;
     border-bottom: 1px solid #aaa;
     background: #f8912c;
     background: -webkit-linear-gradient(right, #f8912c, #f14321);
@@ -19,6 +18,7 @@
     .title-container {
       display: flex;
       align-items: center;
+      margin: 6px 0;
 
       .cat {
         height: 64px;
@@ -68,12 +68,10 @@
 
   .users {
     margin: 0 8px;
-
     flex-grow: 1;
     display: flex;
     flex-wrap: wrap;
     font-size: 12px;
-    justify-content: space-between;
 
     .computer {
       background-image: url('../assets/computer.svg');
@@ -95,6 +93,10 @@
 
         div {
           margin-bottom: 5px;
+        }
+
+        strong {
+          letter-spacing: .5px;
         }
       }
 
