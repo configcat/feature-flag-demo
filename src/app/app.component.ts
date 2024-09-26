@@ -1,4 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Renderer2, Inject, OnDestroy, OnInit } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { environment } from 'src/environments/environment';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import * as configcat from 'configcat-js';
@@ -47,10 +49,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   constructor(
+    private renderer: Renderer2,
+    @Inject(DOCUMENT) private document: Document,
     private route: ActivatedRoute,
     private formBuilder: NonNullableFormBuilder
   ) {
-
+    this.initGoogleTagManager(environment.googleTagManagerId);
   }
   ngOnInit(): void {
     this.paramMapSubscription = this.route.queryParamMap.subscribe(params => {
@@ -79,6 +83,35 @@ export class AppComponent implements OnInit, OnDestroy {
 
       this.generateUsers();
     });
+  }
+
+  initGoogleTagManager(googleTagManagerId: string) {
+    if (!googleTagManagerId) {
+      return;
+    }
+
+    // injecting Google Tag Manager script
+    const script = this.renderer.createElement('script');
+    script.text = `
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','${googleTagManagerId}');
+    `;
+    this.renderer.appendChild(this.document.head, script);
+
+    const noscript = this.renderer.createElement('noscript');
+
+    const iframe = this.renderer.createElement('iframe');
+    iframe.src =
+      'https://www.googletagmanager.com/ns.html?id=' + googleTagManagerId;
+    iframe.height = '0';
+    iframe.width = '0';
+    iframe.style.display = 'none';
+    iframe.style.visibility = 'hidden';
+    noscript.appendChild(iframe);
+    this.renderer.appendChild(this.document.body, noscript);
   }
 
   generateUsers() {
