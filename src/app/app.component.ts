@@ -1,4 +1,4 @@
-import { Component, Renderer2, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Renderer2, OnDestroy, OnInit, inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute } from '@angular/router';
@@ -16,6 +16,11 @@ import { v4 as uuidv4 } from 'uuid';
   standalone: false,
 })
 export class AppComponent implements OnInit, OnDestroy {
+  private renderer = inject(Renderer2);
+  private document = inject<Document>(DOCUMENT);
+  private route = inject(ActivatedRoute);
+  private formBuilder = inject(NonNullableFormBuilder);
+
   paramMapSubscription: Subscription;
   loading = true;
   showControls = true;
@@ -49,12 +54,7 @@ export class AppComponent implements OnInit, OnDestroy {
     return array[Math.floor(Math.random() * array.length)];
   }
 
-  constructor(
-    private renderer: Renderer2,
-    @Inject(DOCUMENT) private document: Document,
-    private route: ActivatedRoute,
-    private formBuilder: NonNullableFormBuilder
-  ) {
+  constructor() {
     this.initGoogleTagManager(environment.googleTagManagerId);
   }
   ngOnInit(): void {
