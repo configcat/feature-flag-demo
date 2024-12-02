@@ -1,19 +1,35 @@
 import { Component, Renderer2, OnDestroy, OnInit, inject } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, NgClass } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import * as configcat from 'configcat-js';
 import { IConfigCatClient } from 'configcat-common/lib/ConfigCatClient';
-import { NonNullableFormBuilder, Validators } from '@angular/forms';
+import { NonNullableFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { uniqueNamesGenerator, names } from 'unique-names-generator';
 import { v4 as uuidv4 } from 'uuid';
+import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  standalone: false,
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormField,
+        MatLabel,
+        MatInput,
+        MatError,
+        MatButton,
+        MatSelect,
+        MatOption,
+        NgClass,
+    ],
 })
 export class AppComponent implements OnInit, OnDestroy {
   private renderer = inject(Renderer2);
