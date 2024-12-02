@@ -10,9 +10,10 @@ import { uniqueNamesGenerator, names } from 'unique-names-generator';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: false
 })
 export class AppComponent implements OnInit, OnDestroy {
   paramMapSubscription: Subscription;
