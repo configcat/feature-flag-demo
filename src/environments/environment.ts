@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  googleTagManagerId: 'GTM-5JPJ37HG'
+  googleTagManagerId: 'GTM-5JPJ37HG',
 };
 
 /*

@@ -1,52 +1,80 @@
-<div *ngIf="!loading" class='container'>
-  <div>
-    <div class="header">
-      <div class="title-container">
-        <img class="cat" src="assets/cat-white.svg" alt="Home" />
-        <div class="title">ConfigCat Playground</div>
+@if (!loading) {
+  <div class="container">
+    <div>
+      <div class="header">
+        <div class="title-container">
+          <img class="cat" src="assets/cat-white.svg" alt="Home" />
+          <div class="title">ConfigCat Playground</div>
+        </div>
       </div>
+      @if (showControls) {
+        <div class="controls">
+          <form [formGroup]="apiKeyFormGroup">
+            <mat-form-field class="textbox" appearance="outline">
+              <mat-label>SDK key</mat-label>
+              <input matInput placeholder="SDK key" formControlName="apiKey" required />
+              @if (apiKeyFormGroup.hasError('apiKey')) {
+                <mat-error>Invalid SDK key</mat-error>
+              }
+            </mat-form-field>
+            <button class="go" mat-flat-button color="primary" (click)="initializeConfigCatClient()">Go</button>
+          </form>
+          @if (showControls) {
+            <form [formGroup]="featureFlagKeyFormGroup">
+              <mat-form-field class="textbox" appearance="outline">
+                <mat-label>Feature flag key</mat-label>
+                <mat-select formControlName="featureFlagKey" required placeholder="Feature flag key" (selectionChange)="initializeFeatureFlagKey()">
+                  @for (key of allKeys; track key) {
+                    <mat-option [value]="key">
+                      {{ key }}
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (apiKeyFormGroup.hasError('featureFlagKey')) {
+                  <mat-error>Invalid API key</mat-error>
+                }
+              </mat-form-field>
+            </form>
+          }
+        </div>
+      }
     </div>
-    <div *ngIf="showControls" class="controls">
-      <form [formGroup]="apiKeyFormGroup">
-        <mat-form-field class='textbox' appearance="outline">
-          <mat-label>SDK key</mat-label>
-          <input matInput placeholder="SDK key" formControlName="apiKey" required>
-          <mat-error *ngIf="apiKeyFormGroup.hasError('apiKey')">
-            Invalid SDK key
-          </mat-error>
-        </mat-form-field>
-        <button class="go" mat-flat-button color="primary" (click)='initializeConfigCatClient()'>Go</button>
-      </form>
-      <form [formGroup]="featureFlagKeyFormGroup" *ngIf="showControls">
-        <mat-form-field class='textbox' appearance="outline">
-          <mat-label>Feature flag key</mat-label>
-          <mat-select formControlName="featureFlagKey" required placeholder="Feature flag key"
-            (selectionChange)="initializeFeatureFlagKey()">
-            <mat-option *ngFor="let key of allKeys" [value]="key">
-              {{key}}
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="apiKeyFormGroup.hasError('featureFlagKey')">
-            Invalid API key
-          </mat-error>
-        </mat-form-field>
-      </form>
-    </div>
-  </div>
-  <div class="info-banner" *ngIf="featureFlagUrl && featureFlagKey && configName && environmentName">
-    💡 In ConfigCat, use the <a [href]="featureFlagUrl" target="_blank"
-      rel="noopener noreferrer"><strong>{{featureFlagKey}}</strong> ({{configName}} / {{environmentName}})</a> feature
-    flag to switch the devices in this simulator. In this simulator, devices will switch between GREEN and RED according
-    to the feature flag being ON and OFF respectively.
-  </div>
-  <div class='users'>
-    <div *ngFor="let user of users" class="computer">
-      <div class='user' *ngIf="featureFlagKeyInitialized" [ngClass]="(user.featureEnabled)?'enabled':''">
-        <div>Email:<br><span class="font-semibold">{{user.userObject.email}}</span></div>
-        <div>Country: <span class="font-semibold">{{user.userObject.country}}</span></div>
-        <div>SubscriptionType: <span class="font-semibold">{{user.userObject.custom.SubscriptionType}}</span></div>
-        <div>Tenant: <span class="font-semibold">{{user.userObject.custom.Tenant}}</span></div>
+    @if (featureFlagUrl && featureFlagKey && configName && environmentName) {
+      <div class="info-banner">
+        💡 In ConfigCat, use the
+        <a [href]="featureFlagUrl" target="_blank" rel="noopener noreferrer">
+          <strong>{{ featureFlagKey }}</strong>
+          ({{ configName }} / {{ environmentName }})
+        </a>
+        feature flag to switch the devices in this simulator. In this simulator, devices will switch between GREEN and RED according to the feature flag being ON and OFF respectively.
       </div>
+    }
+    <div class="users">
+      @for (user of users; track user) {
+        <div class="computer">
+          @if (featureFlagKeyInitialized) {
+            <div class="user" [ngClass]="user.featureEnabled ? 'enabled' : ''">
+              <div>
+                Email:
+                <br />
+                <span class="font-semibold">{{ user.userObject.email }}</span>
+              </div>
+              <div>
+                Country:
+                <span class="font-semibold">{{ user.userObject.country }}</span>
+              </div>
+              <div>
+                SubscriptionType:
+                <span class="font-semibold">{{ user.userObject.custom.SubscriptionType }}</span>
+              </div>
+              <div>
+                Tenant:
+                <span class="font-semibold">{{ user.userObject.custom.Tenant }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
     </div>
   </div>
-</div>
+}
