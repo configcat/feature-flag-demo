@@ -1,0 +1,24 @@
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+pr: none
+name: $(date:yyyyMMdd)$(rev:.r)
+
+pool:
+  name: Contabo
+
+steps:
+  - script: |
+      npm install
+      npm run build
+    displayName: "Build"
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: $(build.artifactstagingdirectory)/dist/feature-flag-demo
+      artifact: PlaygroundApp
