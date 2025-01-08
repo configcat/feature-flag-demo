@@ -16,7 +16,7 @@ steps:
   - script: |
       npm install
       npm run build
-    displayName: "Build"
+    displayName: 'Build'
 
   - task: PublishPipelineArtifact@1
     inputs:

@@ -17,7 +17,17 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule, MatStepperModule, MatInputModule, MatButtonModule, MatSelectModule, MatIconModule),
+    importProvidersFrom(
+      BrowserModule,
+      AppRoutingModule,
+      FormsModule,
+      ReactiveFormsModule,
+      MatStepperModule,
+      MatInputModule,
+      MatButtonModule,
+      MatSelectModule,
+      MatIconModule
+    ),
     provideAnimations(),
   ],
 }).catch(err => console.error(err));

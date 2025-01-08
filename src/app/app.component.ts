@@ -18,7 +18,18 @@ import { v4 as uuidv4 } from 'uuid';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatError, MatButton, MatSelect, MatOption, NgClass],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatError,
+    MatButton,
+    MatSelect,
+    MatOption,
+    NgClass,
+  ],
 })
 export class AppComponent implements OnInit, OnDestroy {
   private renderer = inject(Renderer2);

@@ -23,7 +23,11 @@
             <form [formGroup]="featureFlagKeyFormGroup">
               <mat-form-field class="textbox" appearance="outline">
                 <mat-label>Feature flag key</mat-label>
-                <mat-select formControlName="featureFlagKey" required placeholder="Feature flag key" (selectionChange)="initializeFeatureFlagKey()">
+                <mat-select
+                  formControlName="featureFlagKey"
+                  required
+                  placeholder="Feature flag key"
+                  (selectionChange)="initializeFeatureFlagKey()">
                   @for (key of allKeys; track key) {
                     <mat-option [value]="key">
                       {{ key }}
@@ -46,7 +50,8 @@
           <strong>{{ featureFlagKey }}</strong>
           ({{ configName }} / {{ environmentName }})
         </a>
-        feature flag to switch the devices in this simulator. In this simulator, devices will switch between GREEN and RED according to the feature flag being ON and OFF respectively.
+        feature flag to switch the devices in this simulator. In this simulator, devices will switch between GREEN and
+        RED according to the feature flag being ON and OFF respectively.
       </div>
     }
     <div class="users">
