@@ -17,7 +17,9 @@
                 <mat-error>Invalid SDK key</mat-error>
               }
             </mat-form-field>
-            <button class="go" mat-flat-button color="primary" (click)="initializeConfigCatClient()">Go</button>
+            <button type="button" class="go" mat-flat-button color="primary" (click)="initializeConfigCatClient()">
+              Go
+            </button>
           </form>
           @if (showControls) {
             <form [formGroup]="featureFlagKeyFormGroup">
@@ -46,7 +48,7 @@
     @if (featureFlagUrl && featureFlagKey && configName && environmentName) {
       <div class="info-banner">
         💡 In ConfigCat, use the
-        <a [href]="featureFlagUrl" target="_blank" rel="noopener noreferrer">
+        <a target="_blank" rel="noopener noreferrer" [href]="featureFlagUrl">
           <strong>{{ featureFlagKey }}</strong>
           ({{ configName }} / {{ environmentName }})
         </a>
