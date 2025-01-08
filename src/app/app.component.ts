@@ -1,5 +1,5 @@
 import { DOCUMENT, NgClass } from '@angular/common';
-import { Component, OnDestroy, OnInit, Renderer2, inject } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatOption } from '@angular/material/core';
@@ -7,8 +7,7 @@ import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSelect } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
-import { IConfigCatClient } from 'configcat-common/lib/ConfigCatClient';
-import * as configcat from 'configcat-js';
+import { getClient, PollingMode, type IConfigCatClient } from '@configcat/sdk';
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { names, uniqueNamesGenerator } from 'unique-names-generator';
@@ -183,7 +182,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.configCatClient) {
       this.configCatClient.dispose();
     }
-    this.configCatClient = configcat.getClient(this.apiKey, configcat.PollingMode.AutoPoll, {
+    this.configCatClient = getClient(this.apiKey, PollingMode.AutoPoll, {
       pollIntervalSeconds: 1,
       setupHooks: hooks =>
         hooks.on('configChanged', () => {
