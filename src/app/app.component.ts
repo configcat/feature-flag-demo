@@ -1,35 +1,24 @@
-import { Component, Renderer2, OnDestroy, OnInit, inject } from '@angular/core';
 import { DOCUMENT, NgClass } from '@angular/common';
-import { environment } from 'src/environments/environment';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import * as configcat from 'configcat-js';
-import { IConfigCatClient } from 'configcat-common/lib/ConfigCatClient';
-import { NonNullableFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { uniqueNamesGenerator, names } from 'unique-names-generator';
-import { v4 as uuidv4 } from 'uuid';
-import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
+import { Component, OnDestroy, OnInit, Renderer2, inject } from '@angular/core';
+import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
+import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatSelect } from '@angular/material/select';
+import { ActivatedRoute } from '@angular/router';
+import { IConfigCatClient } from 'configcat-common/lib/ConfigCatClient';
+import * as configcat from 'configcat-js';
+import { Subscription } from 'rxjs';
+import { environment } from 'src/environments/environment';
+import { names, uniqueNamesGenerator } from 'unique-names-generator';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
-    imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormField,
-        MatLabel,
-        MatInput,
-        MatError,
-        MatButton,
-        MatSelect,
-        MatOption,
-        NgClass,
-    ],
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  imports: [FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatError, MatButton, MatSelect, MatOption, NgClass],
 })
 export class AppComponent implements OnInit, OnDestroy {
   private renderer = inject(Renderer2);
@@ -37,19 +26,19 @@ export class AppComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private formBuilder = inject(NonNullableFormBuilder);
 
-  paramMapSubscription: Subscription;
+  paramMapSubscription: Subscription | null = null;
   loading = true;
   showControls = true;
 
-  apiKey: string;
-  configCatClient: IConfigCatClient;
+  apiKey: string | null = null;
+  configCatClient: IConfigCatClient | null = null;
   allKeys: string[] = [];
   configCatClientInitializing = false;
-  featureFlagKey: string;
+  featureFlagKey: string | null = null;
   featureFlagKeyInitialized = false;
-  baseUrl: string;
+  baseUrl: string | null = null;
   apiKeyFormGroup = this.formBuilder.group({ apiKey: ['', Validators.required] });
-  featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['', Validators.required] });
+  featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['' as string | null, Validators.required] });
   startupData: StartupData = {
     domains: [
       { emailDomain: '@example.com', userCount: 12 },
@@ -62,11 +51,11 @@ export class AppComponent implements OnInit, OnDestroy {
   };
   emails: string[] = [];
   users: User[] = [];
-  configName = '';
-  environmentName = '';
-  featureFlagUrl = '';
+  configName: string | null = null;
+  environmentName: string | null = null;
+  featureFlagUrl: string | null = null;
 
-  getRandom(array) {
+  getRandom(array: string[]) {
     return array[Math.floor(Math.random() * array.length)];
   }
 
@@ -85,16 +74,19 @@ export class AppComponent implements OnInit, OnDestroy {
       if (!this.featureFlagKey) {
         this.featureFlagKey = '';
       }
-      this.apiKeyFormGroup.patchValue({ apiKey: this.apiKey });
+
       this.featureFlagKeyFormGroup.patchValue({ featureFlagKey: this.featureFlagKey });
 
       if (this.apiKey) {
+        this.apiKeyFormGroup.patchValue({ apiKey: this.apiKey });
         // at this point, we have everything to try to init the client
         this.initializeConfigCatClient();
         if (this.featureFlagKey && params.get('hideControls') === 'true') {
           // it's very likely the app is configured through the url, and the user wants to use it that way
           this.showControls = false;
         }
+      } else {
+        this.apiKeyFormGroup.reset();
       }
 
       this.loading = false;
@@ -205,7 +197,7 @@ export class AppComponent implements OnInit, OnDestroy {
       }
 
       this.featureFlagKeyFormGroup = this.formBuilder.group({
-        featureFlagKey: [this.featureFlagKey, Validators.required],
+        featureFlagKey: this.formBuilder.control(this.featureFlagKey, { validators: [Validators.required] }),
       });
 
       this.configCatClientInitializing = false;
@@ -241,7 +233,7 @@ export class AppComponent implements OnInit, OnDestroy {
       // Simulate multiple client SDKs with some delays
       setTimeout(
         () => {
-          this.configCatClient.getValueAsync(this.featureFlagKey, false, user.userObject).then(value => {
+          this.configCatClient?.getValueAsync(this.featureFlagKey!, false, user.userObject).then(value => {
             user.featureEnabled = value;
           });
         },
@@ -251,7 +243,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   refresh() {
-    this.configCatClient.getAllKeysAsync().then(keys => {
+    this.configCatClient?.getAllKeysAsync().then(keys => {
       this.allKeys = keys;
     });
   }
