@@ -10,12 +10,13 @@
   ],
   "bracketSpacing": true,
   "bracketSameLine": true,
-  "printWidth": 200,
+  "printWidth": 120,
   "tabWidth": 2,
   "singleQuote": true,
   "useTabs": false,
   "trailingComma": "es5",
   "arrowParens": "avoid",
   "semi": true,
-  "quoteProps": "as-needed"
+  "quoteProps": "as-needed",
+  "endOfLine": "auto"
 }

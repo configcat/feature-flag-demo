@@ -1,55 +1,54 @@
-import { Component, Renderer2, OnDestroy, OnInit, inject } from '@angular/core';
 import { DOCUMENT, NgClass } from '@angular/common';
-import { environment } from 'src/environments/environment';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import * as configcat from 'configcat-js';
-import { IConfigCatClient } from 'configcat-common/lib/ConfigCatClient';
-import { NonNullableFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { uniqueNamesGenerator, names } from 'unique-names-generator';
-import { v4 as uuidv4 } from 'uuid';
-import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
+import { Component, inject, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
+import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatSelect } from '@angular/material/select';
+import { ActivatedRoute } from '@angular/router';
+import { getClient, PollingMode, type IConfigCatClient } from '@configcat/sdk';
+import { Subscription } from 'rxjs';
+import { environment } from 'src/environments/environment';
+import { names, uniqueNamesGenerator } from 'unique-names-generator';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
-    imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormField,
-        MatLabel,
-        MatInput,
-        MatError,
-        MatButton,
-        MatSelect,
-        MatOption,
-        NgClass,
-    ],
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatError,
+    MatButton,
+    MatSelect,
+    MatOption,
+    NgClass,
+  ],
 })
 export class AppComponent implements OnInit, OnDestroy {
-  private renderer = inject(Renderer2);
-  private document = inject<Document>(DOCUMENT);
-  private route = inject(ActivatedRoute);
-  private formBuilder = inject(NonNullableFormBuilder);
+  private readonly renderer = inject(Renderer2);
+  private readonly document = inject<Document>(DOCUMENT);
+  private readonly route = inject(ActivatedRoute);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  paramMapSubscription: Subscription;
+  paramMapSubscription: Subscription | null = null;
   loading = true;
   showControls = true;
 
-  apiKey: string;
-  configCatClient: IConfigCatClient;
+  apiKey: string | null = null;
+  configCatClient: IConfigCatClient | null = null;
   allKeys: string[] = [];
   configCatClientInitializing = false;
-  featureFlagKey: string;
+  featureFlagKey: string | null = null;
   featureFlagKeyInitialized = false;
-  baseUrl: string;
+  baseUrl: string | null = null;
   apiKeyFormGroup = this.formBuilder.group({ apiKey: ['', Validators.required] });
-  featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['', Validators.required] });
+  featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['' as string | null, Validators.required] });
   startupData: StartupData = {
     domains: [
       { emailDomain: '@example.com', userCount: 12 },
@@ -62,11 +61,12 @@ export class AppComponent implements OnInit, OnDestroy {
   };
   emails: string[] = [];
   users: User[] = [];
-  configName = '';
-  environmentName = '';
-  featureFlagUrl = '';
+  configName: string | null = null;
+  environmentName: string | null = null;
+  featureFlagUrl: string | null = null;
 
-  getRandom(array) {
+  getRandom(array: string[]) {
+    // eslint-disable-next-line sonarjs/pseudo-random
     return array[Math.floor(Math.random() * array.length)];
   }
 
@@ -85,16 +85,19 @@ export class AppComponent implements OnInit, OnDestroy {
       if (!this.featureFlagKey) {
         this.featureFlagKey = '';
       }
-      this.apiKeyFormGroup.patchValue({ apiKey: this.apiKey });
+
       this.featureFlagKeyFormGroup.patchValue({ featureFlagKey: this.featureFlagKey });
 
       if (this.apiKey) {
+        this.apiKeyFormGroup.patchValue({ apiKey: this.apiKey });
         // at this point, we have everything to try to init the client
         this.initializeConfigCatClient();
         if (this.featureFlagKey && params.get('hideControls') === 'true') {
           // it's very likely the app is configured through the url, and the user wants to use it that way
           this.showControls = false;
         }
+      } else {
+        this.apiKeyFormGroup.reset();
       }
 
       this.loading = false;
@@ -109,7 +112,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     // injecting Google Tag Manager script
-    const script = this.renderer.createElement('script');
+    const script = this.renderer.createElement('script') as HTMLScriptElement;
     script.text = `
     (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -119,9 +122,9 @@ export class AppComponent implements OnInit, OnDestroy {
     `;
     this.renderer.appendChild(this.document.head, script);
 
-    const noscript = this.renderer.createElement('noscript');
+    const noscript = this.renderer.createElement('noscript') as HTMLScriptElement;
 
-    const iframe = this.renderer.createElement('iframe');
+    const iframe = this.renderer.createElement('iframe') as HTMLIFrameElement;
     iframe.src = 'https://www.googletagmanager.com/ns.html?id=' + googleTagManagerId;
     iframe.height = '0';
     iframe.width = '0';
@@ -159,11 +162,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   generateAndAddEmailAddresses(domain: string, count: number) {
     for (let index = 0; index < count; index++) {
-      const randomName: string = uniqueNamesGenerator({
+      let randomName: string = uniqueNamesGenerator({
         dictionaries: [names],
         length: 1,
       });
-      randomName.replace(/\s/g, '');
+      randomName = randomName.replace(/\s/g, '');
       this.emails.push(`${randomName.toLowerCase()}${domain}`);
     }
   }
@@ -179,7 +182,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.configCatClient) {
       this.configCatClient.dispose();
     }
-    this.configCatClient = configcat.getClient(this.apiKey, configcat.PollingMode.AutoPoll, {
+    this.configCatClient = getClient(this.apiKey, PollingMode.AutoPoll, {
       pollIntervalSeconds: 1,
       setupHooks: hooks =>
         hooks.on('configChanged', () => {
@@ -189,31 +192,36 @@ export class AppComponent implements OnInit, OnDestroy {
       baseUrl: this.baseUrl,
     });
 
-    this.configCatClient.getAllKeysAsync().then(keys => {
-      this.allKeys = keys;
+    this.configCatClient
+      .getAllKeysAsync()
+      .then(keys => {
+        this.allKeys = keys;
 
-      if (this.allKeys.length === 0) {
+        if (this.allKeys.length === 0) {
+          this.configCatClientInitializing = false;
+          this.configCatClient = null;
+
+          this.apiKeyFormGroup.controls.apiKey.setErrors({ invalid: true });
+          return;
+        }
+
+        if (this.allKeys.filter(key => key === this.featureFlagKey).length === 0) {
+          this.featureFlagKey = this.allKeys[0];
+        }
+
+        this.featureFlagKeyFormGroup = this.formBuilder.group({
+          featureFlagKey: this.formBuilder.control(this.featureFlagKey, { validators: [Validators.required] }),
+        });
+
         this.configCatClientInitializing = false;
-        this.configCatClient = null;
 
-        this.apiKeyFormGroup.controls.apiKey.setErrors({ invalid: true });
-        return;
-      }
-
-      if (this.allKeys.filter(key => key === this.featureFlagKey).length === 0) {
-        this.featureFlagKey = this.allKeys[0];
-      }
-
-      this.featureFlagKeyFormGroup = this.formBuilder.group({
-        featureFlagKey: [this.featureFlagKey, Validators.required],
+        if (this.featureFlagKey) {
+          this.initializeFeatureFlagKey();
+        }
+      })
+      .catch((error: unknown) => {
+        console.log(error);
       });
-
-      this.configCatClientInitializing = false;
-
-      if (this.featureFlagKey) {
-        this.initializeFeatureFlagKey();
-      }
-    });
   }
 
   initializeFeatureFlagKey() {
@@ -241,19 +249,30 @@ export class AppComponent implements OnInit, OnDestroy {
       // Simulate multiple client SDKs with some delays
       setTimeout(
         () => {
-          this.configCatClient.getValueAsync(this.featureFlagKey, false, user.userObject).then(value => {
-            user.featureEnabled = value;
-          });
+          this.configCatClient
+            ?.getValueAsync(this.featureFlagKey!, false, user.userObject)
+            .then(value => {
+              user.featureEnabled = value;
+            })
+            .catch(() => {
+              // Intentionally empty
+            });
         },
+        // eslint-disable-next-line sonarjs/pseudo-random
         Math.floor(Math.random() * 800)
       );
     });
   }
 
   refresh() {
-    this.configCatClient.getAllKeysAsync().then(keys => {
-      this.allKeys = keys;
-    });
+    this.configCatClient
+      ?.getAllKeysAsync()
+      .then(keys => {
+        this.allKeys = keys;
+      })
+      .catch(() => {
+        // Intentionally empty
+      });
   }
 
   ngOnDestroy() {
@@ -285,5 +304,5 @@ export interface UserObject {
   identifier: string;
   email: string;
   country: string;
-  custom: any;
+  custom: Record<string, string>;
 }

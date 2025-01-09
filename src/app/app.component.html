@@ -17,13 +17,19 @@
                 <mat-error>Invalid SDK key</mat-error>
               }
             </mat-form-field>
-            <button class="go" mat-flat-button color="primary" (click)="initializeConfigCatClient()">Go</button>
+            <button type="button" class="go" mat-flat-button color="primary" (click)="initializeConfigCatClient()">
+              Go
+            </button>
           </form>
           @if (showControls) {
             <form [formGroup]="featureFlagKeyFormGroup">
               <mat-form-field class="textbox" appearance="outline">
                 <mat-label>Feature flag key</mat-label>
-                <mat-select formControlName="featureFlagKey" required placeholder="Feature flag key" (selectionChange)="initializeFeatureFlagKey()">
+                <mat-select
+                  formControlName="featureFlagKey"
+                  required
+                  placeholder="Feature flag key"
+                  (selectionChange)="initializeFeatureFlagKey()">
                   @for (key of allKeys; track key) {
                     <mat-option [value]="key">
                       {{ key }}
@@ -42,11 +48,12 @@
     @if (featureFlagUrl && featureFlagKey && configName && environmentName) {
       <div class="info-banner">
         💡 In ConfigCat, use the
-        <a [href]="featureFlagUrl" target="_blank" rel="noopener noreferrer">
+        <a target="_blank" rel="noopener noreferrer" [href]="featureFlagUrl">
           <strong>{{ featureFlagKey }}</strong>
           ({{ configName }} / {{ environmentName }})
         </a>
-        feature flag to switch the devices in this simulator. In this simulator, devices will switch between GREEN and RED according to the feature flag being ON and OFF respectively.
+        feature flag to switch the devices in this simulator. In this simulator, devices will switch between GREEN and
+        RED according to the feature flag being ON and OFF respectively.
       </div>
     }
     <div class="users">
@@ -65,11 +72,11 @@
               </div>
               <div>
                 SubscriptionType:
-                <span class="font-semibold">{{ user.userObject.custom.SubscriptionType }}</span>
+                <span class="font-semibold">{{ user.userObject.custom['SubscriptionType'] }}</span>
               </div>
               <div>
                 Tenant:
-                <span class="font-semibold">{{ user.userObject.custom.Tenant }}</span>
+                <span class="font-semibold">{{ user.userObject.custom['Tenant'] }}</span>
               </div>
             </div>
           }
