@@ -1,22 +1,22 @@
-import { DOCUMENT, NgClass } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
-import { MatOption } from '@angular/material/core';
-import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { MatSelect } from '@angular/material/select';
-import { ActivatedRoute } from '@angular/router';
-import { getClient, PollingMode, type IConfigCatClient } from '@configcat/sdk';
-import { Subscription } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { names, uniqueNamesGenerator } from 'unique-names-generator';
-import { v4 as uuidv4 } from 'uuid';
+import { NgClass } from "@angular/common";
+import { Component, DOCUMENT, inject, OnDestroy, OnInit, Renderer2 } from "@angular/core";
+import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { MatButton } from "@angular/material/button";
+import { MatOption } from "@angular/material/core";
+import { MatError, MatFormField, MatLabel } from "@angular/material/form-field";
+import { MatInput } from "@angular/material/input";
+import { MatSelect } from "@angular/material/select";
+import { ActivatedRoute } from "@angular/router";
+import { getClient, type IConfigCatClient, PollingMode } from "@configcat/sdk";
+import { Subscription } from "rxjs";
+import { environment } from "src/environments/environment";
+import { names, uniqueNamesGenerator } from "unique-names-generator";
+import { v4 as uuidv4 } from "uuid";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.scss"],
   imports: [
     FormsModule,
     ReactiveFormsModule,
@@ -47,17 +47,17 @@ export class AppComponent implements OnInit, OnDestroy {
   featureFlagKey: string | null = null;
   featureFlagKeyInitialized = false;
   baseUrl: string | null = null;
-  apiKeyFormGroup = this.formBuilder.group({ apiKey: ['', Validators.required] });
-  featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ['' as string | null, Validators.required] });
+  apiKeyFormGroup = this.formBuilder.group({ apiKey: ["", Validators.required] });
+  featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ["" as string | null, Validators.required] });
   startupData: StartupData = {
     domains: [
-      { emailDomain: '@example.com', userCount: 12 },
-      { emailDomain: '@friends.com', userCount: 12 },
-      { emailDomain: '@mycompany.com', userCount: 12 },
+      { emailDomain: "@example.com", userCount: 12 },
+      { emailDomain: "@friends.com", userCount: 12 },
+      { emailDomain: "@mycompany.com", userCount: 12 },
     ],
-    countries: ['Australia', 'Brazil', 'EU', 'USA'],
-    subscriptionTypes: ['Free', 'Pro', 'Enterprise'],
-    tenants: ['A', 'B', 'C'],
+    countries: ["Australia", "Brazil", "EU", "USA"],
+    subscriptionTypes: ["Free", "Pro", "Enterprise"],
+    tenants: ["A", "B", "C"],
   };
   emails: string[] = [];
   users: User[] = [];
@@ -75,15 +75,15 @@ export class AppComponent implements OnInit, OnDestroy {
   }
   ngOnInit(): void {
     this.paramMapSubscription = this.route.queryParamMap.subscribe(params => {
-      this.apiKey = params.get('sdkKey');
-      this.baseUrl = params.get('baseUrl');
-      this.featureFlagKey = params.get('featureFlagKey');
-      this.featureFlagUrl = params.get('featureFlagUrl');
-      this.environmentName = params.get('environmentName');
-      this.configName = params.get('configName');
+      this.apiKey = params.get("sdkKey");
+      this.baseUrl = params.get("baseUrl");
+      this.featureFlagKey = params.get("featureFlagKey");
+      this.featureFlagUrl = params.get("featureFlagUrl");
+      this.environmentName = params.get("environmentName");
+      this.configName = params.get("configName");
 
       if (!this.featureFlagKey) {
-        this.featureFlagKey = '';
+        this.featureFlagKey = "";
       }
 
       this.featureFlagKeyFormGroup.patchValue({ featureFlagKey: this.featureFlagKey });
@@ -92,7 +92,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.apiKeyFormGroup.patchValue({ apiKey: this.apiKey });
         // at this point, we have everything to try to init the client
         this.initializeConfigCatClient();
-        if (this.featureFlagKey && params.get('hideControls') === 'true') {
+        if (this.featureFlagKey && params.get("hideControls") === "true") {
           // it's very likely the app is configured through the url, and the user wants to use it that way
           this.showControls = false;
         }
@@ -112,7 +112,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     // injecting Google Tag Manager script
-    const script = this.renderer.createElement('script') as HTMLScriptElement;
+    const script = this.renderer.createElement("script") as HTMLScriptElement;
     script.text = `
     (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -122,14 +122,14 @@ export class AppComponent implements OnInit, OnDestroy {
     `;
     this.renderer.appendChild(this.document.head, script);
 
-    const noscript = this.renderer.createElement('noscript') as HTMLScriptElement;
+    const noscript = this.renderer.createElement("noscript") as HTMLScriptElement;
 
-    const iframe = this.renderer.createElement('iframe') as HTMLIFrameElement;
-    iframe.src = 'https://www.googletagmanager.com/ns.html?id=' + googleTagManagerId;
-    iframe.height = '0';
-    iframe.width = '0';
-    iframe.style.display = 'none';
-    iframe.style.visibility = 'hidden';
+    const iframe = this.renderer.createElement("iframe") as HTMLIFrameElement;
+    iframe.src = "https://www.googletagmanager.com/ns.html?id=" + googleTagManagerId;
+    iframe.height = "0";
+    iframe.width = "0";
+    iframe.style.display = "none";
+    iframe.style.visibility = "hidden";
     noscript.appendChild(iframe);
     this.renderer.appendChild(this.document.body, noscript);
   }
@@ -166,7 +166,7 @@ export class AppComponent implements OnInit, OnDestroy {
         dictionaries: [names],
         length: 1,
       });
-      randomName = randomName.replace(/\s/g, '');
+      randomName = randomName.replace(/\s/g, "");
       this.emails.push(`${randomName.toLowerCase()}${domain}`);
     }
   }
@@ -185,7 +185,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.configCatClient = getClient(this.apiKey, PollingMode.AutoPoll, {
       pollIntervalSeconds: 1,
       setupHooks: hooks =>
-        hooks.on('configChanged', () => {
+        hooks.on("configChanged", () => {
           this.refresh();
           this.handleFeatureFlags();
         }),
