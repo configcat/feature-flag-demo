@@ -4,7 +4,6 @@ const tseslint = require("typescript-eslint");
 const stylistic = require("@stylistic/eslint-plugin");
 const importPlugin = require("eslint-plugin-import");
 const angular = require("angular-eslint");
-const customAngular = require("./plugins/angular-eslint/index.mts");
 const rxjs = require("@smarttools/eslint-plugin-rxjs");
 const sonarjs = require("eslint-plugin-sonarjs");
 const eslintPluginPrettierRecommended = require("eslint-plugin-prettier/recommended");
@@ -251,7 +250,6 @@ module.exports = tseslint.config(
     extends: [
       ...angular.configs.templateRecommended,
       ...angular.configs.templateAccessibility,
-      customAngular.configs.recommended,
       eslintPluginPrettierRecommended,
     ],
     linterOptions: { reportUnusedDisableDirectives: "error" },
