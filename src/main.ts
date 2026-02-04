@@ -1,4 +1,4 @@
-import { enableProdMode, importProvidersFrom } from "@angular/core";
+import { enableProdMode, importProvidersFrom, provideZoneChangeDetection } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
@@ -17,7 +17,7 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(
+    provideZoneChangeDetection(),importProvidersFrom(
       BrowserModule,
       AppRoutingModule,
       FormsModule,
