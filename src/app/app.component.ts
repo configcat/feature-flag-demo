@@ -1,20 +1,18 @@
 import { NgClass } from "@angular/common";
-import { Component, DOCUMENT, inject, OnDestroy, OnInit, Renderer2 } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, inject, input, OnInit, Renderer2, signal, WritableSignal } from "@angular/core";
 import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatButton } from "@angular/material/button";
 import { MatOption } from "@angular/material/core";
 import { MatError, MatFormField, MatLabel } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatSelect } from "@angular/material/select";
-import { ActivatedRoute } from "@angular/router";
 import { getClient, type IConfigCatClient, PollingMode } from "@configcat/sdk";
-import { Subscription } from "rxjs";
 import { environment } from "src/environments/environment";
 import { names, uniqueNamesGenerator } from "unique-names-generator";
 import { v4 as uuidv4 } from "uuid";
 
 @Component({
-  selector: "app-root",
+  selector: "app-main",
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
   imports: [
@@ -29,27 +27,42 @@ import { v4 as uuidv4 } from "uuid";
     MatOption,
     NgClass,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit {
   private readonly renderer = inject(Renderer2);
   private readonly document = inject<Document>(DOCUMENT);
-  private readonly route = inject(ActivatedRoute);
   private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  paramMapSubscription: Subscription | null = null;
-  loading = true;
-  showControls = true;
+  readonly sdkKey = input<string>();
+  readonly baseUrl = input<string>();
+  readonly featureFlagKey = input<string>();
+  readonly featureFlagUrl = input<string>();
+  readonly environmentName = input<string>();
+  readonly configName = input<string>();
+  readonly hideControls = input<string>();
 
-  apiKey: string | null = null;
-  configCatClient: IConfigCatClient | null = null;
-  allKeys: string[] = [];
-  configCatClientInitializing = false;
-  featureFlagKey: string | null = null;
-  featureFlagKeyInitialized = false;
-  baseUrl: string | null = null;
-  apiKeyFormGroup = this.formBuilder.group({ apiKey: ["", Validators.required] });
-  featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ["" as string | null, Validators.required] });
-  startupData: StartupData = {
+  readonly loading = signal(true);
+  readonly showControls = computed(() => !this.featureFlagKey() || this.hideControls() !== "true");
+
+  readonly sdkKeyEffect = effect(() => {
+    if (this.sdkKey()) {
+      this.sdkKeyFormGroup.patchValue({ sdkKey: this.sdkKey() });
+    } else {
+      this.sdkKeyFormGroup.reset();
+    }
+  });
+
+  readonly featureFlagKeyEffect = effect(() => {
+    this.featureFlagKeyFormGroup.patchValue({ featureFlagKey: this.featureFlagKey() ?? "" });
+  });
+
+  private configCatClient: IConfigCatClient | null = null;
+  readonly allKeys = signal<string[]>([]);
+  readonly featureFlagKeyInitialized = signal(false);
+  readonly sdkKeyFormGroup = this.formBuilder.group({ sdkKey: ["", Validators.required] });
+  readonly featureFlagKeyFormGroup = this.formBuilder.group({ featureFlagKey: ["" as string | null, Validators.required] });
+  private readonly startupData: StartupData = {
     domains: [
       { emailDomain: "@example.com", userCount: 12 },
       { emailDomain: "@friends.com", userCount: 12 },
@@ -59,11 +72,8 @@ export class AppComponent implements OnInit, OnDestroy {
     subscriptionTypes: ["Free", "Pro", "Enterprise"],
     tenants: ["A", "B", "C"],
   };
-  emails: string[] = [];
-  users: User[] = [];
-  configName: string | null = null;
-  environmentName: string | null = null;
-  featureFlagUrl: string | null = null;
+  private emails: string[] = [];
+  readonly users = signal<User[]>([]);
 
   getRandom(array: string[]) {
     // eslint-disable-next-line sonarjs/pseudo-random
@@ -73,37 +83,23 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor() {
     this.initGoogleTagManager(environment.googleTagManagerId);
   }
+
   ngOnInit(): void {
-    this.paramMapSubscription = this.route.queryParamMap.subscribe(params => {
-      this.apiKey = params.get("sdkKey");
-      this.baseUrl = params.get("baseUrl");
-      this.featureFlagKey = params.get("featureFlagKey");
-      this.featureFlagUrl = params.get("featureFlagUrl");
-      this.environmentName = params.get("environmentName");
-      this.configName = params.get("configName");
 
-      if (!this.featureFlagKey) {
-        this.featureFlagKey = "";
-      }
-
-      this.featureFlagKeyFormGroup.patchValue({ featureFlagKey: this.featureFlagKey });
-
-      if (this.apiKey) {
-        this.apiKeyFormGroup.patchValue({ apiKey: this.apiKey });
-        // at this point, we have everything to try to init the client
+    this.sdkKeyFormGroup.valueChanges.subscribe(v => {
+      if (v.sdkKey) {
         this.initializeConfigCatClient();
-        if (this.featureFlagKey && params.get("hideControls") === "true") {
-          // it's very likely the app is configured through the url, and the user wants to use it that way
-          this.showControls = false;
-        }
-      } else {
-        this.apiKeyFormGroup.reset();
       }
-
-      this.loading = false;
-
-      this.generateUsers();
     });
+
+    this.featureFlagKeyFormGroup.valueChanges.subscribe(v => {
+      if (v.featureFlagKey) {
+        this.handleFeatureFlags();
+      }
+    });
+
+    this.generateUsers();
+    this.loading.set(false);
   }
 
   initGoogleTagManager(googleTagManagerId: string) {
@@ -135,13 +131,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   generateUsers() {
-    this.users = [];
     this.emails = [];
     this.startupData.domains.forEach(domain => {
       this.generateAndAddEmailAddresses(domain.emailDomain, domain.userCount);
     });
 
-    this.users = this.emails.map(email => {
+    this.users.set(this.emails.map(email => {
       return {
         userObject: {
           identifier: uuidv4(),
@@ -152,10 +147,10 @@ export class AppComponent implements OnInit, OnDestroy {
             Tenant: this.getRandom(this.startupData.tenants),
           },
         },
-        featureEnabled: false,
+        featureEnabled: signal(false),
       };
-    });
-    if (this.apiKey) {
+    }));
+    if (this.sdkKeyFormGroup.value.sdkKey) {
       this.handleFeatureFlags();
     }
   }
@@ -172,50 +167,43 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   initializeConfigCatClient() {
-    if (!this.apiKeyFormGroup.valid) {
+    if (!this.sdkKeyFormGroup.valid) {
       return;
     }
 
-    this.apiKey = this.apiKeyFormGroup.controls.apiKey.value;
-
-    this.configCatClientInitializing = true;
     if (this.configCatClient) {
       this.configCatClient.dispose();
     }
-    this.configCatClient = getClient(this.apiKey, PollingMode.AutoPoll, {
+    this.configCatClient = getClient(this.sdkKeyFormGroup.controls.sdkKey.value, PollingMode.AutoPoll, {
       pollIntervalSeconds: 1,
       setupHooks: hooks =>
         hooks.on("configChanged", () => {
           this.refresh();
           this.handleFeatureFlags();
         }),
-      baseUrl: this.baseUrl,
+      baseUrl: this.baseUrl(),
     });
 
     this.configCatClient
       .getAllKeysAsync()
       .then(keys => {
-        this.allKeys = keys;
+        this.allKeys.set(keys);
 
-        if (this.allKeys.length === 0) {
-          this.configCatClientInitializing = false;
+        if (this.allKeys().length === 0) {
           this.configCatClient = null;
 
-          this.apiKeyFormGroup.controls.apiKey.setErrors({ invalid: true });
+          this.sdkKeyFormGroup.controls.sdkKey.setErrors({ invalid: true });
           return;
         }
 
-        if (this.allKeys.filter(key => key === this.featureFlagKey).length === 0) {
-          this.featureFlagKey = this.allKeys[0];
+        let featureFlagKey = this.featureFlagKey();
+        if (this.allKeys().filter(key => key === this.featureFlagKey()).length === 0) {
+          featureFlagKey = this.allKeys()[0];
         }
 
-        this.featureFlagKeyFormGroup = this.formBuilder.group({
-          featureFlagKey: this.formBuilder.control(this.featureFlagKey, { validators: [Validators.required] }),
-        });
+        this.featureFlagKeyFormGroup.patchValue({ featureFlagKey });
 
-        this.configCatClientInitializing = false;
-
-        if (this.featureFlagKey) {
+        if (this.featureFlagKeyFormGroup.controls.featureFlagKey.value) {
           this.initializeFeatureFlagKey();
         }
       })
@@ -226,13 +214,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   initializeFeatureFlagKey() {
     if (!this.featureFlagKeyFormGroup.valid) {
-      this.featureFlagKeyInitialized = false;
+      this.featureFlagKeyInitialized.set(false);
       return;
     }
 
-    this.featureFlagKey = this.featureFlagKeyFormGroup.controls.featureFlagKey.value;
-
-    this.featureFlagKeyInitialized = true;
+    this.featureFlagKeyInitialized.set(true);
     this.handleFeatureFlags();
   }
 
@@ -241,18 +227,18 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   handleFeatureFlags() {
-    if (!this.featureFlagKeyInitialized) {
+    if (!this.featureFlagKeyInitialized()) {
       return;
     }
 
-    this.users.forEach(user => {
+    this.users().forEach(user => {
       // Simulate multiple client SDKs with some delays
       setTimeout(
         () => {
           this.configCatClient
-            ?.getValueAsync(this.featureFlagKey!, false, user.userObject)
+            ?.getValueAsync(this.featureFlagKeyFormGroup.value.featureFlagKey!, false, user.userObject)
             .then(value => {
-              user.featureEnabled = value;
+              user.featureEnabled.set(value);
             })
             .catch(() => {
               // Intentionally empty
@@ -268,41 +254,34 @@ export class AppComponent implements OnInit, OnDestroy {
     this.configCatClient
       ?.getAllKeysAsync()
       .then(keys => {
-        this.allKeys = keys;
+        this.allKeys.set(keys);
       })
       .catch(() => {
         // Intentionally empty
       });
   }
-
-  ngOnDestroy() {
-    if (this.paramMapSubscription) {
-      this.paramMapSubscription.unsubscribe();
-      this.paramMapSubscription = null;
-    }
-  }
 }
 
 export interface UserData {
-  emailDomain: string;
-  userCount: number;
+  readonly emailDomain: string;
+  readonly userCount: number;
 }
 
 export interface StartupData {
-  domains: UserData[];
-  countries: string[];
-  subscriptionTypes: string[];
-  tenants: string[];
+  readonly domains: UserData[];
+  readonly countries: string[];
+  readonly subscriptionTypes: string[];
+  readonly tenants: string[];
 }
 
 export interface User {
-  userObject: UserObject;
-  featureEnabled: boolean;
+  readonly userObject: UserObject;
+  readonly featureEnabled: WritableSignal<boolean>;
 }
 
 export interface UserObject {
-  identifier: string;
-  email: string;
-  country: string;
-  custom: Record<string, string>;
+  readonly identifier: string;
+  readonly email: string;
+  readonly country: string;
+  readonly custom: Record<string, string>;
 }
