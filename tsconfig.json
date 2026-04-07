@@ -32,7 +32,6 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true,
     "strictStandalone": true,
-    "fullTemplateTypeCheck": true,
     "extendedDiagnostics": {
       "defaultCategory": "error"
     }
