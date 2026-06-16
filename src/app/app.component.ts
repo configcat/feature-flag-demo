@@ -7,9 +7,9 @@ import { MatError, MatFormField, MatLabel } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatSelect } from "@angular/material/select";
 import { getClient, type IConfigCatClient, PollingMode } from "@configcat/sdk";
-import { environment } from "src/environments/environment";
 import { names, uniqueNamesGenerator } from "unique-names-generator";
 import { v4 as uuidv4 } from "uuid";
+import { environment } from "../environments/environment";
 
 @Component({
   selector: "app-main",
