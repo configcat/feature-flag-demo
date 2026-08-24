@@ -12,7 +12,7 @@ do
     mv "$DIST_BASE_DIR/tempjsfile.js" "$JSFILE"
 done
 
-if [[ -n "$CC_CdnUrl" ]]; then
+if [ -n "${CC_CdnUrl:-}" ]; then
     CONF=/etc/nginx/security-headers.conf
     sed -i "s|# CONNECTPLACEHOLDER|set \$CONNECT \"\${CONNECT} $CC_CdnUrl\";|" "$CONF"
 fi
